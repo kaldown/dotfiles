@@ -31,7 +31,7 @@ set wildignore=*.pyc
 set laststatus=2   " always show status line
 set statusline=%f\ -\ %y
 set cmdheight=2    " height of status line
-set shortmess+=c   " don't pass messages to |ins-completion-menu|
+set shortmess+=cI   " don't pass messages to |ins-completion-menu|
 au BufNewFile,BufRead * let b:mtrailingws=matchadd('ErrorMsg', '\s\+$', -1) " show trailing whitespaces
 "au CursorMoved * Lost
 set updatetime=50  " update more frequently
