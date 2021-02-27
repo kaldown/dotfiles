@@ -1,16 +1,16 @@
 [user]
-	email = kaldownb@gmail.com
-	name = kAldown
+    email = kaldownb@gmail.com
+    name = kAldown
 
 [core]
-	hooksPath = /home/kaldown/.config/git/hooks
-	pager = delta
+    hooksPath = /home/kaldown/.config/git/hooks
+    pager = delta
 
 [pull]
-	rebase = false
+    rebase = false
 
 [push]
-	followTags = true
+    followTags = true
 
 [delta]
     plus-color = "#012800"
