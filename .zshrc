@@ -91,6 +91,7 @@ alias find=fd
 alias fzf=fzf -m
 #alias paru="paru --skipreview"
 alias dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
+alias wifi=iwctl
 
 function record() {
 	ffmpeg \
