@@ -16,7 +16,7 @@ ZSH_THEME="robbyrussell"
 # HYPHEN_INSENSITIVE="true"
 
 # Uncomment the following line to disable bi-weekly auto-update checks.
-DISABLE_AUTO_UPDATE="true"
+#DISABLE_AUTO_UPDATE="true"
 
 # Uncomment the following line to change how often to auto-update (in days).
 UPDATE_ZSH_DAYS=2
@@ -28,7 +28,7 @@ UPDATE_ZSH_DAYS=2
 # DISABLE_AUTO_TITLE="true"
 
 # Uncomment the following line to enable command auto-correction.
-#ENABLE_CORRECTION="true"
+ENABLE_CORRECTION="true"
 
 # Uncomment the following line to display red dots whilst waiting for completion.
 COMPLETION_WAITING_DOTS="true"
@@ -90,33 +90,33 @@ alias grep=rg
 alias find=fd
 alias fzf=fzf -m
 #alias paru="paru --skipreview"
-alias dc='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
+alias dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 
 function record() {
 	ffmpeg \
 	-f pulse -ac 2 -i alsa_input.pci-0000_00_1b.0.analog-stereo \
 	-f pulse -ac 2 -i alsa_output.pci-0000_00_1b.0.analog-stereo.monitor \
-	-f x11grab -video_size 1920x1080 -framerate 30 -i :0.0 -vcodec libx264 -qp 0 -pix_fmt yuv420p -preset slow \
+	-f x11grab -video_size 1920x1080 -framerate 30 -i :0.0 -vcodec libx265 -qp 0 -pix_fmt yuv420p -preset slow \
 	-acodec libmp3lame -ar 44100 -q:a 1 \
 	~/Videos/records/$(date +%Y-%m-%d_%H:%M:%S)_video.mkv
 }
 
 function record_no_voice() {
 	ffmpeg \
-	-f x11grab -video_size 1920x1080 -framerate 30 -i :0.0 -vcodec libx264 -qp 0 -pix_fmt yuv420p -preset slow \
+	-f x11grab -video_size 1920x1080 -framerate 30 -i :0.0 -vcodec libx265 -qp 0 -pix_fmt yuv420p -preset slow \
 	-acodec libmp3lame -ar 44100 -q:a 1 \
 	~/Videos/records/$(date +%Y-%m-%d_%H:%M:%S)_video.mkv
 }
 
 # zsh opts
+setopt HIST_EXPIRE_DUPS_FIRST    # Expire duplicate entries first when trimming history.
+setopt HIST_FIND_NO_DUPS         # Do not display a line previously found.
+setopt HIST_IGNORE_ALL_DUPS      # Delete old recorded entry if new entry is a duplicate.
+setopt HIST_IGNORE_DUPS          # Don't record an entry that was just recorded again.
+setopt HIST_IGNORE_SPACE         # Don't record an entry starting with a space.
+setopt HIST_SAVE_NO_DUPS  	     # Don't write duplicate entries in the history file.
 setopt INC_APPEND_HISTORY        # Write to the history file immediately, not when the shell exits.
 setopt SHARE_HISTORY             # Share history between all sessions.
-setopt HIST_EXPIRE_DUPS_FIRST    # Expire duplicate entries first when trimming history.
-setopt HIST_IGNORE_DUPS          # Don't record an entry that was just recorded again.
-setopt HIST_IGNORE_ALL_DUPS      # Delete old recorded entry if new entry is a duplicate.
-setopt HIST_FIND_NO_DUPS         # Do not display a line previously found.
-setopt HIST_IGNORE_SPACE         # Don't record an entry starting with a space.
-setopt HIST_SAVE_NO_DUPS  	 # Don't write duplicate entries in the history file.
 
 source /usr/share/fzf/key-bindings.zsh && source /usr/share/fzf/completion.zsh
 
