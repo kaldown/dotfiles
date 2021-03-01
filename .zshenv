@@ -3,6 +3,7 @@ export VISUAL=nvim
 export FZF_DEFAULT_COMMAND='rg --files --no-ignore-vcs --hidden'
 export LESS="-FRKX"
 export TERM=xterm-256color
+export XDG_CONFIG_HOME=$HOME/.config
 
 # fzf opts
 export FZF_DEFAULT_OPTS='--preview "cat {}"'
