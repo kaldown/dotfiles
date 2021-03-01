@@ -19,7 +19,7 @@ ZSH_THEME="robbyrussell"
 #DISABLE_AUTO_UPDATE="true"
 
 # Uncomment the following line to change how often to auto-update (in days).
-UPDATE_ZSH_DAYS=2
+UPDATE_ZSH_DAYS=14
 
 # Uncomment the following line to disable colors in ls.
 # DISABLE_LS_COLORS="true"
@@ -90,7 +90,7 @@ alias grep=rg
 alias find=fd
 alias fzf=fzf -m
 #alias paru="paru --skipreview"
-alias dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
+alias dotfiles="/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME"
 alias wifi=iwctl
 
 function record() {
