@@ -1,7 +1,0 @@
-[Match]
-Name=wlan0
-SSID=MGTS_GPON_C9BE
-
-[Network]
-DHCPServer=true
-DHCP=ipv4
