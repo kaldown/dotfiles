@@ -53,7 +53,8 @@ nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
 nnoremap <C-l> <C-w>l
 
-cmap w!! w !sudo tee > /dev/null %    " save as root
+" save as root
+cmap w!! w !sudo tee > /dev/null %
 noremap <silent><Leader>/ :nohls<CR>  " disable highlighting
 
 " template pasting
