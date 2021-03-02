@@ -1,8 +1,8 @@
-set exrc          " source vimrc in proj dir
-set guicursor=    " fat cursor
-"set hidden        " change buffer without save
+set exrc                          " source vimrc in proj dir
+set guicursor=                    " fat cursor
+"set hidden                       " change buffer without save
 set noerrorbells
-set nowrap        " allows to write on one long line
+set nowrap                        " allows to write on one long line
 set tabstop=4
 set softtabstop=4
 set shiftwidth=4
@@ -11,33 +11,30 @@ set smartindent
 set nobackup
 set nowritebackup
 set noswapfile
-set incsearch      " set curson upon writing when search
-"set termguicolors " with tmux shows colors too acid
-set t_Co=256       " tmux color problem
+set incsearch                     " set curson upon writing when search
+"set termguicolors                " with tmux shows colors too acid
+set t_Co=256                      " tmux color problem
 set background=dark
-set scrolloff=8    " show more code when N lines away
+set scrolloff=8                   " show more code when N lines away
 "set undodir=$HOME"/.undodir"
 set undofile
-"set viminfo='30    " browse oldfiles limit (outdited since using :History)
+"set viminfo='30                  " browse oldfiles limit (outdited since using :History)
 "set autochdir
 set nocompatible
-set clipboard=unnamedplus   " yank into clipboard
+set clipboard=unnamedplus         " yank into clipboard
 set hlsearch
-set nowrapscan     " prevent search being looped
-set backspace=indent,eol,start     " backspace behave as expect
-set path=$PWD/**   " cool file finding mechanism
+set nowrapscan                    " prevent search being looped
+set backspace=indent,eol,start    " backspace behave as expect
+set path=$PWD/**                  " cool file finding mechanism
 set wildmenu
 set wildignore=*.pyc
-set laststatus=2   " always show status line
+set laststatus=2                  " always show status line
 set statusline=%f\ -\ %y
-set cmdheight=2    " height of status line
-set shortmess+=cI   " don't pass messages to |ins-completion-menu|
-au BufNewFile,BufRead * let b:mtrailingws=matchadd('ErrorMsg', '\s\+$', -1) " show trailing whitespaces
-"au CursorMoved * Lost
-set updatetime=50  " update more frequently
+set cmdheight=2                   " height of status line
+set shortmess+=cI                 " don't pass messages to |ins-completion-menu|
+set updatetime=50                 " update more frequently
+
 let g:python3_host_prog="/usr/bin/python"
-
-
 let mapleader = ","
 
 " disable F1
@@ -120,6 +117,8 @@ command! -nargs=* W w
 
 nnoremap <F5> :UndotreeToggle<CR>  " toggle undotree
 
+au BufNewFile,BufRead * let b:mtrailingws=matchadd('ErrorMsg', '\s\+$', -1) " show trailing whitespaces
+"au CursorMoved * Lost
 
 " DEPRECATED
 
