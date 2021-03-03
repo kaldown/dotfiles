@@ -61,9 +61,12 @@ call plug#begin('~/.config/nvim/plugged')
 
 Plug 'junegunn/fzf.vim'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
-Plug 'fannheyward/coc-pyright'
+Plug 'fannheyward/coc-pyright', {'do': 'yarn install --frozen-lockfile'}
 Plug 'mbbill/undotree'
 Plug 'airblade/vim-gitgutter'
+Plug 'nvim-lua/popup.nvim'
+Plug 'nvim-lua/plenary.nvim'
+Plug 'nvim-telescope/telescope.nvim'
 
 " DEPRECATED
 "Plug 'dense-analysis/ale'
@@ -102,8 +105,8 @@ autocmd FileType javascript setlocal ts=4 sts=4 sw=4 expandtab
 " py specific
 "autocmd FileType python set colorcolumn=80 " show red line on 80
 
-command DiffOrig vert new | set buftype=nofile | read ++edit # | 0d_
-\ | diffthis | wincmd p | diffthis
+" already enabled somewhere
+"command DiffOrig vert new | set buftype=nofile | read ++edit # | 0d_ | diffthis | wincmd p | diffthis
 
 " Golang
 let g:go_def_mode='gopls'
@@ -119,6 +122,8 @@ nnoremap <F5> :UndotreeToggle<CR>  " toggle undotree
 
 au BufNewFile,BufRead * let b:mtrailingws=matchadd('ErrorMsg', '\s\+$', -1) " show trailing whitespaces
 "au CursorMoved * Lost
+
+let $RC="$XDG_CONFIG_HOME/nvim/plug_config/base.vim"
 
 " DEPRECATED
 
