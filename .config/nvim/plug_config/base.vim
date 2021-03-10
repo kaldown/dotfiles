@@ -66,6 +66,7 @@ Plug 'airblade/vim-gitgutter'
 Plug 'nvim-lua/popup.nvim'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
+Plug 'morhetz/gruvbox'
 
 " DEPRECATED
 "Plug 'dense-analysis/ale'
@@ -77,8 +78,9 @@ Plug 'nvim-telescope/telescope.nvim'
 call plug#end()
 
 " 'syntax' and 'filetype plugin indent' need to be overrided only after call plug#begin()
-syntax off
+syntax on
 filetype plugin on
+autocmd vimenter * ++nested colorscheme gruvbox
 
 " ripgrep
 "command! -bang -nargs=* Find call fzf#vim#grep('rg -tpy -tjs --column --line-number --no-heading --fixed-strings --ignore-case --follow --color "always" '.shellescape(<q-args>).'| tr -d "\017"', 1, <bang>0)
