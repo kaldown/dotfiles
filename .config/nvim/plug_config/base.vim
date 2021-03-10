@@ -16,8 +16,6 @@ set incsearch                     " set curson upon writing when search
 set t_Co=256                      " tmux color problem
 set background=dark
 set scrolloff=8                   " show more code when N lines away
-"set undodir=$HOME"/.undodir"
-set undofile
 "set viminfo='30                  " browse oldfiles limit (outdited since using :History)
 "set autochdir
 set nocompatible
@@ -125,6 +123,7 @@ au BufNewFile,BufRead * let b:mtrailingws=matchadd('ErrorMsg', '\s\+$', -1) " sh
 "au CursorMoved * Lost
 
 let $RC="$XDG_CONFIG_HOME/nvim/plug_config/base.vim"
+
 
 " DEPRECATED
 
