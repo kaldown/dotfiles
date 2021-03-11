@@ -138,7 +138,7 @@ bar {
 #### my conf instead defaults ####
 
 # keyboard layout switcher
-#exec --no-startup-id "setxkbmap -model pc105 -layout us,ru -option grp:alt_shift_toggle"
+exec --no-startup-id "setxkbmap -model pc105 -layout us,ru -option grp:alt_shift_toggle"
 # change CAPS to BACKSPACE
 exec --no-startup-id setxkbmap -option caps:backspace
 # disable BACKSPACE

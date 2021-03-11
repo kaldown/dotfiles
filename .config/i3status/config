@@ -11,33 +11,30 @@ general {
         interval = 5
 }
 
-#order += "ipv6"
-order += "disk /home"
-order += "run_watch DHCP"
-order += "run_watch VPN"
+#order += "disk /"
+#order += "disk /home"
+order += "load"
+order += "ethernet wg0"
 order += "wireless wlan0"
 order += "ethernet enp6s0"
-order += "load"
 order += "tztime local"
 order += "volume master"
 
 wireless wlan0 {
-        format_up = "W: (%quality at %essid) %ip"
-        format_down = "W: down"
+        format_up = "wlan0: (%quality at %essid ) %ip"
+        format_down = "wlan0: down"
 }
 
-ethernet enp6s0 {
+ethernet enp7s0 {
         # if you use %speed, i3status requires root privileges
-        format_up = "E: %ip (%speed)"
+        #format_up = "E: %ip (%speed)"
+        format_up = "E: %ip"
         format_down = "E: down"
 }
 
-run_watch DHCP {
-        pidfile = "/run/dhcpcd-wlp3s0.pid"
-}
-
-run_watch VPN {
-        pidfile = "/var/run/vpnc/pid"
+ethernet wg0 {
+        format_up = "WireGuard: %ip"
+        format_down = "WireGuard: down"
 }
 
 tztime local {
@@ -49,7 +46,11 @@ load {
 }
 
 disk "/home" {
-        format = "%avail"
+        format = "/home %avail"
+}
+
+disk "/" {
+        format = "/ %avail"
 }
 
 volume master {

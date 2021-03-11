@@ -7,6 +7,7 @@ set tabstop=4
 set softtabstop=4
 set shiftwidth=4
 set expandtab
+"set autoindent
 set smartindent
 set nobackup
 set nowritebackup
@@ -62,11 +63,12 @@ Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'fannheyward/coc-pyright', {'do': 'yarn install --frozen-lockfile'}
 Plug 'mbbill/undotree'
 Plug 'airblade/vim-gitgutter'
-" Telescope deps
+Plug 'morhetz/gruvbox'
+" Telescope
 Plug 'nvim-lua/popup.nvim'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
-Plug 'morhetz/gruvbox'
+" END Telescope
 
 " DEPRECATED
 "Plug 'dense-analysis/ale'
@@ -119,12 +121,17 @@ nnoremap <Leader>r :w \| !clear && echo "\n" && ./%<CR>
 " disable unconvenient mappings
 command! -nargs=* W w
 
-nnoremap <F5> :UndotreeToggle<CR>  " toggle undotree
+" show trailing whitespaces as red marks
+au BufNewFile,BufRead * let b:mtrailingws=matchadd('ErrorMsg', '\s\+$', -1)
 
-au BufNewFile,BufRead * let b:mtrailingws=matchadd('ErrorMsg', '\s\+$', -1) " show trailing whitespaces
-"au CursorMoved * Lost
-
+" shortcut to base.vim
 let $RC="$XDG_CONFIG_HOME/nvim/plug_config/base.vim"
+let $RTP=split(&runtimepath, ',')[0]
+
+" Undotree
+nnoremap <F5> :UndotreeToggle<CR>  " toggle undotree
+set undodir="$HOME/.undodir"
+set undofile
 
 
 " DEPRECATED
