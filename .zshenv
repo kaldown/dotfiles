@@ -9,3 +9,4 @@ export TMUXP_CONFIGDIR=$XDG_CONFIG_HOME/tmuxp
 # fzf opts
 export FZF_DEFAULT_OPTS='--preview "cat {}"'
 export FZF_DEFAULT_COMMAND='fd --type f'
+export FZF_CTRL_T_COMMAND='git ls-files --deleted --modified --others --exclude-standard'
