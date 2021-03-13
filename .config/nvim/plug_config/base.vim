@@ -3,15 +3,15 @@ set guicursor=                    " fat cursor
 "set hidden                       " change buffer without save
 set noerrorbells
 set nowrap                        " allows to write on one long line
+set nobackup
+set nowritebackup
+set noswapfile
 set tabstop=4
 set softtabstop=4
 set shiftwidth=4
 set expandtab
-"set autoindent
+set autoindent
 set smartindent
-set nobackup
-set nowritebackup
-set noswapfile
 set incsearch                     " set curson upon writing when search
 "set termguicolors                " with tmux shows colors too acid
 set t_Co=256                      " tmux color problem
@@ -81,7 +81,7 @@ call plug#end()
 
 " 'syntax' and 'filetype plugin indent' need to be overrided only after call plug#begin()
 syntax on
-filetype plugin on
+filetype plugin indent on
 autocmd vimenter * ++nested colorscheme gruvbox
 
 " ripgrep

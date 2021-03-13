@@ -16,7 +16,8 @@ general {
 order += "load"
 order += "ethernet wg0"
 order += "wireless wlan0"
-order += "ethernet enp6s0"
+order += "ethernet enp7s0"
+order += "battery 0"
 order += "tztime local"
 order += "volume master"
 
@@ -35,6 +36,16 @@ ethernet enp7s0 {
 ethernet wg0 {
         format_up = "WireGuard: %ip"
         format_down = "WireGuard: down"
+}
+
+battery 0 {
+    format = "%status %percentage %remaining"
+    format_down = "No Battery"
+    last_full_capacity = true
+    integer_battery_capacity = true
+    path = "/sys/class/power_supply/BAT%d/uevent"
+    low_threshold = 20
+    threshold_type = time
 }
 
 tztime local {
