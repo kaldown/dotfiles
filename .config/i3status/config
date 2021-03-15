@@ -17,6 +17,7 @@ order += "load"
 order += "ethernet wg0"
 order += "wireless wlan0"
 order += "ethernet enp7s0"
+order += "read_file brightness"
 order += "battery 0"
 order += "tztime local"
 order += "volume master"
@@ -50,6 +51,11 @@ battery 0 {
 
 tztime local {
         format = "%Y-%m-%d %H:%M"
+}
+
+read_file brightness {
+        format = "BRI: %content"
+        path = "/sys/class/backlight/intel_backlight/brightness"
 }
 
 load {
