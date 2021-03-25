@@ -100,6 +100,11 @@ function record_no_voice() {
 	~/Videos/records/$(date +%Y-%m-%d_%H:%M:%S)_video.mkv
 }
 
+function dotfiles() {
+  git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME "$@"
+}
+
+
 # zsh opts
 setopt HIST_EXPIRE_DUPS_FIRST    # Expire duplicate entries first when trimming history.
 setopt HIST_FIND_NO_DUPS         # Do not display a line previously found.
