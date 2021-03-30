@@ -6,9 +6,6 @@
     hooksPath = /home/kaldown/.config/git/hooks
     pager = delta
 
-[pull]
-    rebase = false
-
 [push]
     followTags = true
 
