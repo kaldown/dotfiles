@@ -1,7 +1,7 @@
-alias mpv="mpv --fs --audio-file-auto=exact"
+alias mpv='mpv --fs --audio-file-auto=exact'
 alias vim=nvim
-alias xclip="xclip -sel cl"
+alias xclip='xclip -sel cl'
 alias grep=rg
 alias find=fd
-alias fzf=fzf -m
+alias fzf='fzf -m'
 alias wifi=iwctl
