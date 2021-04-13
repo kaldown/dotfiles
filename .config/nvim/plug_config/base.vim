@@ -54,13 +54,15 @@ cmap w!! w !sudo tee > /dev/null %
 noremap <silent><Leader>/ :nohls<CR>  " disable highlighting
 
 " template pasting
-"nnoremap ,html :-1read ~/.vim/templates/html<CR>
+nnoremap ,models :-1read $XDG_CONFIG_HOME/nvim/templates/flask-models<CR>
+nnoremap ,api :-1read $XDG_CONFIG_HOME/nvim/templates/flask-api<CR>
 
 call plug#begin('~/.config/nvim/plugged')
 
 Plug 'junegunn/fzf.vim'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'fannheyward/coc-pyright', {'do': 'yarn install --frozen-lockfile'}
+Plug 'neoclide/coc-tsserver', {'do': 'yarn install --frozen-lockfile'}
 Plug 'mbbill/undotree'
 Plug 'airblade/vim-gitgutter'
 Plug 'morhetz/gruvbox'

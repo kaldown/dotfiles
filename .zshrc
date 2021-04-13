@@ -118,3 +118,4 @@ setopt SHARE_HISTORY             # Share history between all sessions.
 source /usr/share/fzf/key-bindings.zsh && source /usr/share/fzf/completion.zsh
 
 eval "$(direnv hook zsh)"
+source /usr/share/nvm/init-nvm.sh
