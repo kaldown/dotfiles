@@ -158,5 +158,5 @@ bindsym XF86MonBrightnessUp exec xbacklight -inc 5
 bindsym XF86MonBrightnessDown exec xbacklight -dec 5
 
 # screenshots
-bindsym Print exec scrot '%Y-%m-%d_%hhmmss_$wx$h_scrot.png' -e 'mv --backup=t $f ~/Pictures/screenshots/'
-bindsym --release Shift+Print exec scrot -s '%Y-%m-%d_$wx$h_scrot.png' -e 'mv --backup=t $f ~/Pictures/screenshots/'
+bindsym Print exec flameshot full -c
+bindsym --release Shift+Print exec flameshot gui
