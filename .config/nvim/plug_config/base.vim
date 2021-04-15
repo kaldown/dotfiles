@@ -82,14 +82,15 @@ Plug 'nvim-telescope/telescope.nvim'
 call plug#end()
 
 " 'syntax' and 'filetype plugin indent' need to be overrided only after call plug#begin()
-syntax on
+" typescript syntax fix https://github.com/neovim/neovim/issues/14356#issuecomment-820429884
+syntax on sync fromstart
 filetype plugin indent on
 autocmd vimenter * ++nested colorscheme gruvbox
 
 " ripgrep
 "command! -bang -nargs=* Find call fzf#vim#grep('rg -tpy -tjs --column --line-number --no-heading --fixed-strings --ignore-case --follow --color "always" '.shellescape(<q-args>).'| tr -d "\017"', 1, <bang>0)
 function! RipgrepFzf(query, fullscreen)
-  let command_fmt = 'rg -tpy -tjs --sort-files --column --line-number --no-heading --color=always --smart-case --fixed-strings --follow --glob="!*lib/" -- %s || true'
+  let command_fmt = 'rg -tpy -tjs -tts --sort-files --column --line-number --no-heading --color=always --smart-case --fixed-strings --follow --glob="!*lib/" -- %s || true'
   let initial_command = printf(command_fmt, shellescape(a:query))
   let reload_command = printf(command_fmt, '{q}')
   let spec = {'options': ['--phony', '--query', a:query, '--bind', 'change:reload:'.reload_command]}
@@ -155,3 +156,6 @@ endif
 "\  'sink':    'e',
 "\  'options': '-m -x +s',
 "\  'down':    '40%'})
+
+set guifont=Hack:h15
+let g:neovide_cursor_vfx_mode = "railgun"
