@@ -156,6 +156,3 @@ endif
 "\  'sink':    'e',
 "\  'options': '-m -x +s',
 "\  'down':    '40%'})
-
-set guifont=Hack:h15
-let g:neovide_cursor_vfx_mode = "railgun"
