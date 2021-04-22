@@ -159,4 +159,4 @@ bindsym XF86MonBrightnessDown exec xbacklight -dec 5
 
 # screenshots
 bindsym Print exec flameshot full -c
-bindsym --release Shift+Print exec flameshot gui
+bindsym --release Shift+Print exec flameshot gui -r | xclip -in -selection clipboard -target image/png
