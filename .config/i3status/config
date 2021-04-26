@@ -43,6 +43,8 @@ battery 0 {
     format = "%status %percentage %remaining"
     format_down = "No Battery"
     last_full_capacity = true
+    status_chr = "⚡"
+    status_bat = "🔋"
     integer_battery_capacity = true
     path = "/sys/class/power_supply/BAT%d/uevent"
     low_threshold = 20
