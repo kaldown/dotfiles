@@ -24,7 +24,7 @@ set clipboard=unnamedplus         " yank into clipboard
 set hlsearch
 set nowrapscan                    " prevent search being looped
 set backspace=indent,eol,start    " backspace behave as expect
-set path=$PWD/**                  " cool file finding mechanism
+set path+=$PWD/**                  " cool file finding mechanism
 set wildmenu
 set wildignore=*.pyc
 set laststatus=2                  " always show status line
@@ -148,6 +148,18 @@ if has('persistent_undo')
 endif
 
 
+let g:netrw_banner = 0
+let g:netrw_liststyle = 3
+let g:netrw_altv = 1
+let g:netrw_winsize = 25
+" return to file when CTRL-^ is pressed, instead of netrw
+let g:netrw_altfile = 1
+augroup ProjectDrawer
+  autocmd!
+  autocmd VimEnter * :Explore
+augroup END
+
+
 " DEPRECATED
 
 " use History from fzf
@@ -156,13 +168,3 @@ endif
 "\  'sink':    'e',
 "\  'options': '-m -x +s',
 "\  'down':    '40%'})
-
-let g:netrw_banner = 0
-let g:netrw_liststyle = 3
-let g:netrw_browse_split = 4
-let g:netrw_altv = 1
-let g:netrw_winsize = 25
-augroup ProjectDrawer
-  autocmd!
-  autocmd VimEnter * :Vexplore
-augroup END
