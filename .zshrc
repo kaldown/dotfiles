@@ -104,6 +104,10 @@ function dotfiles() {
   git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME "$@"
 }
 
+function loadnvm() {
+    source /usr/share/nvm/init-nvm.sh
+}
+
 
 # zsh opts
 setopt HIST_EXPIRE_DUPS_FIRST    # Expire duplicate entries first when trimming history.
@@ -118,4 +122,3 @@ setopt SHARE_HISTORY             # Share history between all sessions.
 source /usr/share/fzf/key-bindings.zsh && source /usr/share/fzf/completion.zsh
 
 eval "$(direnv hook zsh)"
-source /usr/share/nvm/init-nvm.sh
