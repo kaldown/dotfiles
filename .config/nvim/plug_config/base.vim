@@ -62,10 +62,10 @@ call plug#begin('~/.config/nvim/plugged')
 Plug 'junegunn/fzf.vim'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'fannheyward/coc-pyright', {'do': 'yarn install --frozen-lockfile'}
-Plug 'neoclide/coc-tsserver', {'do': 'yarn install --frozen-lockfile'}
 Plug 'mbbill/undotree'
 Plug 'airblade/vim-gitgutter'
 Plug 'morhetz/gruvbox'
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 " Telescope
 Plug 'nvim-lua/popup.nvim'
 Plug 'nvim-lua/plenary.nvim'
@@ -73,6 +73,9 @@ Plug 'nvim-telescope/telescope.nvim'
 " END Telescope
 
 " DEPRECATED
+" used too much CPU
+"Plug 'neoclide/coc-tsserver', {'do': 'yarn install --frozen-lockfile'}
+"Plug 'neovim/nvim-lspconfig'
 "Plug 'dense-analysis/ale'
 "Plug 'ycm-core/YouCompleteMe', {'do': './install.py'}
 "Plug 'git://github.com/frioux/vim-lost'
@@ -96,7 +99,8 @@ function! RipgrepFzf(query, fullscreen)
   let spec = {'options': ['--phony', '--query', a:query, '--bind', 'change:reload:'.reload_command]}
   call fzf#vim#grep(initial_command, 1, fzf#vim#with_preview(spec), a:fullscreen)
 endfunction
-command! -nargs=* -bang Find call RipgrepFzf(<q-args>, <bang>0)
+" using telescope for it
+"command! -nargs=* -bang Find call RipgrepFzf(<q-args>, <bang>0)
 
 " start cursor from a previous place
 if has("autocmd")
@@ -118,7 +122,7 @@ autocmd FileType javascript setlocal ts=4 sts=4 sw=4 expandtab
 let g:go_def_mode='gopls'
 let g:go_info_mode='gopls'
 
-" run, depend on shebang
+" execute code depending on shebang
 nnoremap <Leader>r :w \| !clear && echo "\n" && ./%<CR>
 
 " disable unconvenient mappings
@@ -154,10 +158,11 @@ let g:netrw_altv = 1
 let g:netrw_winsize = 25
 " return to file when CTRL-^ is pressed, instead of netrw
 let g:netrw_altfile = 1
-augroup ProjectDrawer
-  autocmd!
-  autocmd VimEnter * :Explore
-augroup END
+" commenting out prevents from opening exact file
+"augroup ProjectDrawer
+"  autocmd!
+"  autocmd VimEnter * :Explore
+"augroup END
 
 
 " DEPRECATED
