@@ -1,5 +1,6 @@
 alias mpv='mpv --fs --audio-file-auto=exact'
 alias vim=nvim
+alias cp='cp -i'
 alias xclip='xclip -sel cl'
 alias grep=rg
 alias find=fd
