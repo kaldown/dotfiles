@@ -1,3 +1,4 @@
+set rtp+=/opt/homebrew/opt/fzf	  " to use fzf in MacOS
 set exrc                          " source vimrc in proj dir
 set guicursor=                    " fat cursor
 "set hidden                       " change buffer without save
@@ -18,13 +19,13 @@ set t_Co=256                      " tmux color problem
 set background=dark
 set scrolloff=8                   " show more code when N lines away
 "set viminfo='30                  " browse oldfiles limit (outdited since using :History)
-"set autochdir
+set autochdir
 set nocompatible
 set clipboard=unnamedplus         " yank into clipboard
 set hlsearch
 set nowrapscan                    " prevent search being looped
 set backspace=indent,eol,start    " backspace behave as expect
-set path+=$PWD/**                  " cool file finding mechanism
+set path+=$PWD/**                 " cool file finding mechanism
 set wildmenu
 set wildignore=*.pyc
 set laststatus=2                  " always show status line
@@ -40,9 +41,9 @@ let mapleader = ","
 nmap <F1> <nop>
 nmap <M-F1> <nop>
 
-vnoremap < <gv " continue visual selecting after shiftwidh
+vnoremap < <gv 			  " continue visual selecting after shiftwidh
 vnoremap > >gv
-vnoremap <leader>p "_dP   " using this command, can past multiple times without re-filling yank history
+vnoremap <leader>p "_dP  	  " using this command, can past multiple times without re-filling yank history
 
 nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
@@ -57,19 +58,20 @@ noremap <silent><Leader>/ :nohls<CR>  " disable highlighting
 nnoremap ,models :-1read $XDG_CONFIG_HOME/nvim/templates/flask-models<CR>
 nnoremap ,api :-1read $XDG_CONFIG_HOME/nvim/templates/flask-api<CR>
 
-call plug#begin('~/.config/nvim/plugged')
+call plug#begin('~/.local/share/nvim/plugged')
 
-Plug 'junegunn/fzf.vim'
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
-Plug 'fannheyward/coc-pyright', {'do': 'yarn install --frozen-lockfile'}
+"Plug 'neoclide/coc.nvim', {'branch': 'release'}
+"Plug 'fannheyward/coc-pyright'
 Plug 'mbbill/undotree'
 Plug 'airblade/vim-gitgutter'
 Plug 'morhetz/gruvbox'
-Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+
 " Telescope
 Plug 'nvim-lua/popup.nvim'
 Plug 'nvim-lua/plenary.nvim'
-Plug 'nvim-telescope/telescope.nvim'
+Plug 'nvim-telescope/telescope.nvim', { 'tag': '0.1.1' }
+Plug 'nvim-tree/nvim-web-devicons'
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 " END Telescope
 
 " DEPRECATED
@@ -123,7 +125,7 @@ let g:go_def_mode='gopls'
 let g:go_info_mode='gopls'
 
 " execute code depending on shebang
-nnoremap <Leader>r :w \| !clear && echo "\n" && ./%<CR>
+"nnoremap <Leader>r :w \| !clear && echo "\n" && ./%<CR>
 
 " disable unconvenient mappings
 command! -nargs=* W w
@@ -132,7 +134,7 @@ command! -nargs=* W w
 au BufNewFile,BufRead * let b:mtrailingws=matchadd('ErrorMsg', '\s\+$', -1)
 
 " shortcut to base.vim
-let $RC="$XDG_CONFIG_HOME/nvim/plug_config/base.vim"
+let $RC="$HOME/.local/share/nvim/plug_config/base.vim"
 let $RTP=split(&runtimepath, ',')[0]
 
 " Undotree
@@ -173,3 +175,13 @@ let g:netrw_altfile = 1
 "\  'sink':    'e',
 "\  'options': '-m -x +s',
 "\  'down':    '40%'})
+
+
+" Execute current file using Python, depending on file extension
+function! RunCurrentFile()
+  let extension = expand('%:e')
+  if extension == 'py'
+    execute '!/opt/homebrew/bin/python3 %'
+  endif
+endfunction
+autocmd FileType python nnoremap <leader>r :call RunCurrentFile()<CR>
