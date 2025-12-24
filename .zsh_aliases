@@ -1,159 +1,245 @@
-# ══════════════════════════════════════════════════════════════════════════════
+# ==============================================================================
 # ZSH ALIASES - kaldown
-# ══════════════════════════════════════════════════════════════════════════════
-# Philosophy: Don't replace find/grep/cat - scripts and tools expect POSIX.
-# Instead, use short aliases for interactive use.
+# ==============================================================================
+# Philosophy: Don't replace core POSIX tools (find/grep/cat) - scripts expect them.
+# Use short aliases for interactive use. Modern replacements for monitoring tools
+# are safe since scripts rarely use them.
+#
+# CLAUDE CODE / AI AGENTS:
+# - These aliases only load in interactive shells
+# - To bypass any alias, prefix with backslash: \grep, \find, \top
+# - Or use: command grep, command find
+# - See ~/.config/claude/CLAUDE.md for detailed tool mappings
+# ==============================================================================
 
-# ══════════════════════════════════════════════════════════════════════════════
-# MODERN TOOL SHORTCUTS (use these interactively)
-# ══════════════════════════════════════════════════════════════════════════════
+# ------------------------------------------------------------------------------
+# MODERN TOOL SHORTCUTS (interactive use - doesn't break scripts)
+# ------------------------------------------------------------------------------
 
-# fd - better find (short alias, doesn't break scripts)
+# fd - better find
 alias f='fd'
 alias ff='fd --type f'        # files only
 alias fh='fd --hidden'        # include hidden
+alias fa='fd --hidden --no-ignore'  # find absolutely everything
 
-# ripgrep - better grep (short alias)
+# ripgrep - better grep
 alias g='rg'
 alias gi='rg -i'              # case insensitive
 alias gl='rg -l'              # files only (list)
+alias gv='rg -v'              # invert match
 
-# bat - better cat (short alias)
+# bat - better cat
 alias b='bat'
 alias bp='bat --plain'        # no decorations
 alias bn='bat -n'             # with line numbers
 
-# ══════════════════════════════════════════════════════════════════════════════
-# LS REPLACEMENTS (safe to alias - compatible args)
-# ══════════════════════════════════════════════════════════════════════════════
+# ------------------------------------------------------------------------------
+# SAFE REPLACEMENTS (compatible args or rarely used by scripts)
+# ------------------------------------------------------------------------------
 
-# Using eza if available, fallback to lsd
-if (( ${+commands[eza]} )); then
-  alias ls='eza --icons'
-  alias la='eza --icons -a'
-  alias ll='eza --icons -la'
-  alias lt='eza --icons --tree'
-  alias lg='eza --icons -la --git'      # with git status
-  alias l1='eza --icons -1'             # one per line
-  alias lm='eza --icons -la --sort=modified'  # by modified time
-else
-  alias ls='lsd'
-  alias la='lsd -a'
-  alias ll='lsd -la'
-  alias lt='lsd --tree'
-  alias l1='lsd -1'
-fi
+# ls → eza (safe: basic flags are compatible)
+alias ls='eza --icons'
+alias la='eza --icons -a'
+alias ll='eza --icons -la'
+alias lt='eza --icons --tree'
+alias lg='eza --icons -la --git'
+alias l1='eza --icons -1'
+alias lm='eza --icons -la --sort=modified'
+alias lsize='eza --icons -la --sort=size'
 
-# ══════════════════════════════════════════════════════════════════════════════
+# System monitoring (safe: scripts don't typically use these interactively)
+(( ${+commands[btop]} )) && alias top='btop'
+(( ${+commands[btop]} )) && alias htop='btop'
+(( ${+commands[procs]} )) && alias pss='procs'  # not replacing ps, new alias
+
+# Disk usage (safe: rarely used programmatically)
+(( ${+commands[duf]} )) && alias df='duf'
+(( ${+commands[dust]} )) && alias du='dust'
+(( ${+commands[ncdu]} )) && alias duc='ncdu'    # disk usage curses
+
+# Network (safe alternatives)
+(( ${+commands[gping]} )) && alias pping='gping'   # pretty ping (not replacing ping)
+(( ${+commands[dog]} )) && alias ddig='dog'        # pretty dig (not replacing dig)
+(( ${+commands[xh]} )) && alias http='xh'          # httpie alternative
+(( ${+commands[curlie]} )) && alias curl='curlie'  # curl with colors
+
+# ------------------------------------------------------------------------------
 # EDITOR
-# ══════════════════════════════════════════════════════════════════════════════
+# ------------------------------------------------------------------------------
 
 alias vim='lvim'
 alias v='lvim'
 alias vi='lvim'
+alias e='$EDITOR'
 
-# ══════════════════════════════════════════════════════════════════════════════
+# Quick edit configs
+alias zshrc='$EDITOR ~/.zshrc'
+alias aliases='$EDITOR ~/.zsh_aliases'
+alias vimrc='$EDITOR ~/.config/lvim/config.lua'
+alias wezrc='$EDITOR ~/.config/wezterm/wezterm.lua'
+
+# ------------------------------------------------------------------------------
 # NAVIGATION
-# ══════════════════════════════════════════════════════════════════════════════
+# ------------------------------------------------------------------------------
 
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
-alias -- -='cd -'             # go back
+alias .....='cd ../../../..'
+alias -- -='cd -'
 
-# ══════════════════════════════════════════════════════════════════════════════
+# Quick dirs
+alias dl='cd ~/Downloads'
+alias proj='cd ~/Projects'
+alias desk='cd ~/Desktop'
+
+# ------------------------------------------------------------------------------
 # SAFETY
-# ══════════════════════════════════════════════════════════════════════════════
+# ------------------------------------------------------------------------------
 
 alias cp='cp -i'
 alias mv='mv -i'
 alias rm='rm -i'
 alias mkdir='mkdir -pv'
+alias ln='ln -iv'
 
-# ══════════════════════════════════════════════════════════════════════════════
-# DISK USAGE (if modern tools installed)
-# ══════════════════════════════════════════════════════════════════════════════
-
-(( ${+commands[duf]} )) && alias df='duf'
-(( ${+commands[dust]} )) && alias du='dust'
-
-# ══════════════════════════════════════════════════════════════════════════════
+# ------------------------------------------------------------------------------
 # GIT SHORTCUTS
-# ══════════════════════════════════════════════════════════════════════════════
+# ------------------------------------------------------------------------------
 
 alias gs='git status'
+alias gss='git status -sb'
 alias gd='git diff'
 alias gds='git diff --staged'
 alias gp='git pull'
 alias gP='git push'
 alias gc='git commit'
 alias gcm='git commit -m'
+alias gca='git commit --amend'
+alias gcan='git commit --amend --no-edit'
 alias gco='git checkout'
+alias gcb='git checkout -b'
 alias gb='git branch'
 alias gba='git branch -a'
-alias gl='git log --oneline -20'
-alias gla='git log --oneline --all --graph'
+alias gbd='git branch -d'
+alias glog='git log --oneline -20'
+alias gloga='git log --oneline --all --graph'
 alias ga='git add'
 alias gaa='git add -A'
+alias gap='git add -p'
 alias gst='git stash'
 alias gstp='git stash pop'
+alias gstl='git stash list'
+alias gr='git restore'
+alias grs='git restore --staged'
+alias gundo='git reset --soft HEAD~1'
+alias gwip='git add -A && git commit -m "WIP"'
 
-# lazygit if installed
-(( ${+commands[lazygit]} )) && alias lg='lazygit'
+# lazygit
+(( ${+commands[lazygit]} )) && alias lzg='lazygit'
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ------------------------------------------------------------------------------
 # DOCKER SHORTCUTS
-# ══════════════════════════════════════════════════════════════════════════════
+# ------------------------------------------------------------------------------
 
 alias d='docker'
 alias dc='docker compose'
+alias dcu='docker compose up'
+alias dcud='docker compose up -d'
+alias dcd='docker compose down'
+alias dcl='docker compose logs -f'
 alias dps='docker ps'
 alias dpsa='docker ps -a'
 alias dimg='docker images'
 alias dex='docker exec -it'
 alias dlogs='docker logs -f'
+alias dprune='docker system prune -af'
 
-# lazydocker if installed
+# lazydocker
 (( ${+commands[lazydocker]} )) && alias lzd='lazydocker'
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ------------------------------------------------------------------------------
 # PYTHON / UV
-# ══════════════════════════════════════════════════════════════════════════════
+# ------------------------------------------------------------------------------
 
 alias py='python3'
+alias py2='python2'
 alias pip='uv pip'
+alias pipi='uv pip install'
+alias pipu='uv pip install --upgrade'
 alias venv='uv venv'
 alias activate='source .venv/bin/activate'
+alias deact='deactivate'
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ------------------------------------------------------------------------------
+# DEV TOOLS
+# ------------------------------------------------------------------------------
+
+# Code stats
+(( ${+commands[tokei]} )) && alias loc='tokei'
+(( ${+commands[scc]} )) && alias scc='scc'
+
+# Benchmarking
+(( ${+commands[hyperfine]} )) && alias bench='hyperfine'
+
+# JSON/YAML
+(( ${+commands[jq]} )) && alias jq='jq'          # already good
+(( ${+commands[yq]} )) && alias yq='yq'          # already good
+alias json='jq .'                                # pretty print JSON
+alias yaml='yq .'                                # pretty print YAML
+
+# Text processing (short aliases, not replacing)
+(( ${+commands[sd]} )) && alias sd='sd'          # better sed
+(( ${+commands[choose]} )) && alias c='choose'   # better cut
+(( ${+commands[grex]} )) && alias regex='grex'   # generate regex
+
+# Help
+(( ${+commands[tldr]} )) && alias help='tldr'
+(( ${+commands[tldr]} )) && alias '?'='tldr'
+
+# ------------------------------------------------------------------------------
 # MISC UTILITIES
-# ══════════════════════════════════════════════════════════════════════════════
+# ------------------------------------------------------------------------------
 
-alias fzf='fzf -m'            # multi-select by default
+alias fzf='fzf -m'
 alias h='history'
+alias hg='history | rg'
 alias j='jobs -l'
 alias path='echo $PATH | tr ":" "\n"'
-alias reload='source ~/.zshrc'
+alias reload='exec zsh'
 alias cls='clear'
+alias c='clear'
+alias q='exit'
 
-# Quick HTTP server
-alias serve='python3 -m http.server'
+# ------------------------------------------------------------------------------
+# Clipboard (macOS)
+# ------------------------------------------------------------------------------
+
+alias y='cb copy'                    # yank
+alias p='cb paste'                   # paste  
+alias yl='fc -ln -1 | cb copy'       # yank last command
+alias yd='pwd | cb copy'             # yank directory
 
 # IP addresses
 alias myip='curl -s https://ipinfo.io/ip'
 alias localip='ipconfig getifaddr en0'
+alias ips="ifconfig | grep 'inet ' | grep -v 127.0.0.1 | awk '{print \$2}'"
 
 # macOS specific
 alias flushdns='sudo dscacheutil -flushcache && sudo killall -HUP mDNSResponder'
 alias showfiles='defaults write com.apple.finder AppleShowAllFiles YES && killall Finder'
 alias hidefiles='defaults write com.apple.finder AppleShowAllFiles NO && killall Finder'
+alias afk='pmset displaysleepnow'          # lock screen
 
-# ══════════════════════════════════════════════════════════════════════════════
+# Timestamps
+alias now='date +"%Y-%m-%d %H:%M:%S"'
+alias nowdate='date +"%Y-%m-%d"'
+alias nowtime='date +"%H:%M:%S"'
+alias epoch='date +%s'
+
+# ------------------------------------------------------------------------------
 # FUNCTIONS
-# ══════════════════════════════════════════════════════════════════════════════
-
-# Make directory and cd into it
-mkcd() { mkdir -p "$1" && cd "$1" }
+# ------------------------------------------------------------------------------
 
 # Extract any archive
 extract() {
@@ -180,3 +266,27 @@ extract() {
 
 # Quick backup
 bak() { cp "$1" "$1.bak.$(date +%Y%m%d_%H%M%S)" }
+
+# Weather
+weather() { curl -s "wttr.in/${1:-Brussels}?format=3" }
+
+# Cheat sheet
+cheat() { curl -s "cheat.sh/$1" }
+
+# Port check
+port() { lsof -i :"$1" }
+ports() { lsof -i -P -n | grep LISTEN }
+
+# Kill process on port
+killport() { lsof -ti :"$1" | xargs kill -9 }
+
+# ------------------------------------------------------------------------------
+# ORIGINAL COMMAND ACCESS (for reference)
+# ------------------------------------------------------------------------------
+# These commands are aliased but originals are always available:
+#   \top      - original top (aliased to btop)
+#   \df       - original df (aliased to duf)
+#   \du       - original du (aliased to dust)
+#   \ls       - original ls (aliased to eza)
+#   command X - always runs original X
+# ------------------------------------------------------------------------------
