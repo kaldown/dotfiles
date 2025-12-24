@@ -1,0 +1,182 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# ZSH ALIASES - kaldown
+# ══════════════════════════════════════════════════════════════════════════════
+# Philosophy: Don't replace find/grep/cat - scripts and tools expect POSIX.
+# Instead, use short aliases for interactive use.
+
+# ══════════════════════════════════════════════════════════════════════════════
+# MODERN TOOL SHORTCUTS (use these interactively)
+# ══════════════════════════════════════════════════════════════════════════════
+
+# fd - better find (short alias, doesn't break scripts)
+alias f='fd'
+alias ff='fd --type f'        # files only
+alias fh='fd --hidden'        # include hidden
+
+# ripgrep - better grep (short alias)
+alias g='rg'
+alias gi='rg -i'              # case insensitive
+alias gl='rg -l'              # files only (list)
+
+# bat - better cat (short alias)
+alias b='bat'
+alias bp='bat --plain'        # no decorations
+alias bn='bat -n'             # with line numbers
+
+# ══════════════════════════════════════════════════════════════════════════════
+# LS REPLACEMENTS (safe to alias - compatible args)
+# ══════════════════════════════════════════════════════════════════════════════
+
+# Using eza if available, fallback to lsd
+if (( ${+commands[eza]} )); then
+  alias ls='eza --icons'
+  alias la='eza --icons -a'
+  alias ll='eza --icons -la'
+  alias lt='eza --icons --tree'
+  alias lg='eza --icons -la --git'      # with git status
+  alias l1='eza --icons -1'             # one per line
+  alias lm='eza --icons -la --sort=modified'  # by modified time
+else
+  alias ls='lsd'
+  alias la='lsd -a'
+  alias ll='lsd -la'
+  alias lt='lsd --tree'
+  alias l1='lsd -1'
+fi
+
+# ══════════════════════════════════════════════════════════════════════════════
+# EDITOR
+# ══════════════════════════════════════════════════════════════════════════════
+
+alias vim='lvim'
+alias v='lvim'
+alias vi='lvim'
+
+# ══════════════════════════════════════════════════════════════════════════════
+# NAVIGATION
+# ══════════════════════════════════════════════════════════════════════════════
+
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias -- -='cd -'             # go back
+
+# ══════════════════════════════════════════════════════════════════════════════
+# SAFETY
+# ══════════════════════════════════════════════════════════════════════════════
+
+alias cp='cp -i'
+alias mv='mv -i'
+alias rm='rm -i'
+alias mkdir='mkdir -pv'
+
+# ══════════════════════════════════════════════════════════════════════════════
+# DISK USAGE (if modern tools installed)
+# ══════════════════════════════════════════════════════════════════════════════
+
+(( ${+commands[duf]} )) && alias df='duf'
+(( ${+commands[dust]} )) && alias du='dust'
+
+# ══════════════════════════════════════════════════════════════════════════════
+# GIT SHORTCUTS
+# ══════════════════════════════════════════════════════════════════════════════
+
+alias gs='git status'
+alias gd='git diff'
+alias gds='git diff --staged'
+alias gp='git pull'
+alias gP='git push'
+alias gc='git commit'
+alias gcm='git commit -m'
+alias gco='git checkout'
+alias gb='git branch'
+alias gba='git branch -a'
+alias gl='git log --oneline -20'
+alias gla='git log --oneline --all --graph'
+alias ga='git add'
+alias gaa='git add -A'
+alias gst='git stash'
+alias gstp='git stash pop'
+
+# lazygit if installed
+(( ${+commands[lazygit]} )) && alias lg='lazygit'
+
+# ══════════════════════════════════════════════════════════════════════════════
+# DOCKER SHORTCUTS
+# ══════════════════════════════════════════════════════════════════════════════
+
+alias d='docker'
+alias dc='docker compose'
+alias dps='docker ps'
+alias dpsa='docker ps -a'
+alias dimg='docker images'
+alias dex='docker exec -it'
+alias dlogs='docker logs -f'
+
+# lazydocker if installed
+(( ${+commands[lazydocker]} )) && alias lzd='lazydocker'
+
+# ══════════════════════════════════════════════════════════════════════════════
+# PYTHON / UV
+# ══════════════════════════════════════════════════════════════════════════════
+
+alias py='python3'
+alias pip='uv pip'
+alias venv='uv venv'
+alias activate='source .venv/bin/activate'
+
+# ══════════════════════════════════════════════════════════════════════════════
+# MISC UTILITIES
+# ══════════════════════════════════════════════════════════════════════════════
+
+alias fzf='fzf -m'            # multi-select by default
+alias h='history'
+alias j='jobs -l'
+alias path='echo $PATH | tr ":" "\n"'
+alias reload='source ~/.zshrc'
+alias cls='clear'
+
+# Quick HTTP server
+alias serve='python3 -m http.server'
+
+# IP addresses
+alias myip='curl -s https://ipinfo.io/ip'
+alias localip='ipconfig getifaddr en0'
+
+# macOS specific
+alias flushdns='sudo dscacheutil -flushcache && sudo killall -HUP mDNSResponder'
+alias showfiles='defaults write com.apple.finder AppleShowAllFiles YES && killall Finder'
+alias hidefiles='defaults write com.apple.finder AppleShowAllFiles NO && killall Finder'
+
+# ══════════════════════════════════════════════════════════════════════════════
+# FUNCTIONS
+# ══════════════════════════════════════════════════════════════════════════════
+
+# Make directory and cd into it
+mkcd() { mkdir -p "$1" && cd "$1" }
+
+# Extract any archive
+extract() {
+  if [[ -f "$1" ]]; then
+    case "$1" in
+      *.tar.bz2)   tar xjf "$1"     ;;
+      *.tar.gz)    tar xzf "$1"     ;;
+      *.tar.xz)    tar xJf "$1"     ;;
+      *.bz2)       bunzip2 "$1"     ;;
+      *.gz)        gunzip "$1"      ;;
+      *.tar)       tar xf "$1"      ;;
+      *.tbz2)      tar xjf "$1"     ;;
+      *.tgz)       tar xzf "$1"     ;;
+      *.zip)       unzip "$1"       ;;
+      *.Z)         uncompress "$1"  ;;
+      *.7z)        7z x "$1"        ;;
+      *.rar)       unrar x "$1"     ;;
+      *)           echo "'$1' cannot be extracted" ;;
+    esac
+  else
+    echo "'$1' is not a valid file"
+  fi
+}
+
+# Quick backup
+bak() { cp "$1" "$1.bak.$(date +%Y%m%d_%H%M%S)" }

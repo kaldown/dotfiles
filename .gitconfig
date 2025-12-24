@@ -1,0 +1,42 @@
+[user]
+    email = kaldownb@gmail.com
+    name = kAldown
+
+[core]
+    #hooksPath = /home/kaldown/.config/git/hooks
+    pager = delta
+
+[push]
+    followTags = true
+    autoSetupRemote = true
+
+[delta]
+    plus-color = "#012800"
+    minus-color = "#340001"
+    syntax-theme = Monokai Extended
+    decorations = true
+    features = side-by-side line-numbers decorations
+    whitespace-error-style = 22 reverse
+    navigate = true
+
+[interactive]
+    diffFilter = delta --color-only
+
+[delta "decorations"]
+    commit-decoration-style = bold yellow box ul
+    file-style = bold yellow ul
+    file-decoration-style = none
+
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+
+[init]
+	defaultBranch = main
+
+[alias]
+	appraise = !~/go/bin/git-appraise
+[pull]
+	rebase = true

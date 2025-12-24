@@ -1,0 +1,66 @@
+# DOTFILES .gitignore - Ignore everything, whitelist what we track
+
+# Ignore everything by default
+*
+
+# ═══════════════════════════════════════════════════════════════════
+# TRACK THESE (negate with !)
+# ═══════════════════════════════════════════════════════════════════
+
+# Shell
+!.zshrc
+!.zshenv
+!.zprofile
+!.zsh_aliases
+!.p10k.zsh
+
+# Git
+!.gitconfig
+!.gitignore
+
+# Config directories
+!.config/
+!.config/nvim/
+!.config/nvim/**
+!.config/lvim/
+!.config/lvim/**
+!.config/wezterm/
+!.config/wezterm/**
+!.config/atuin/
+!.config/atuin/**
+!.config/git/
+!.config/git/**
+
+# ═══════════════════════════════════════════════════════════════════
+# ALWAYS IGNORE (sensitive)
+# ═══════════════════════════════════════════════════════════════════
+
+# User sensetive
+Applications/
+Desktop/
+Documents/
+Downloads/
+Games/
+Library/
+Movies/
+Music/
+Pictures/
+Projects/
+Public/
+SteamLibrary/
+Sync/
+go/
+
+.aws/
+.ssh/
+.gnupg/
+.pgpass
+.boto
+.zsh_history
+.cache/
+.zcompdump*
+.cfg/
+.DS_Store
+*.bak
+
+*~
