@@ -3,40 +3,184 @@
     name = kAldown
 
 [core]
-    #hooksPath = /home/kaldown/.config/git/hooks
+    editor = nvim
     pager = delta
+    autocrlf = input
+    whitespace = fix,-indent-with-non-tab,trailing-space,cr-at-eol
+    excludesfile = ~/.gitignore
 
-[push]
-    followTags = true
-    autoSetupRemote = true
+[init]
+    defaultBranch = main
+
+# ------------------------------------------------------------------------------
+# DELTA (beautiful diffs)
+# ------------------------------------------------------------------------------
 
 [delta]
-    plus-color = "#012800"
-    minus-color = "#340001"
-    syntax-theme = Monokai Extended
-    decorations = true
-    features = side-by-side line-numbers decorations
-    whitespace-error-style = 22 reverse
-    navigate = true
+    navigate = true                    # n/N to jump between files
+    dark = true
+    line-numbers = true
+    side-by-side = false               # set true for wide terminals
+    syntax-theme = Catppuccin Macchiato
+    
+    # Modern styling (replaces deprecated plus-color/minus-color)
+    plus-style = syntax "#1e3a2f"
+    plus-emph-style = syntax "#2d5a45"
+    minus-style = syntax "#3a1e2f"
+    minus-emph-style = syntax "#5a2d45"
+    
+    # File headers
+    file-style = bold yellow ul
+    file-decoration-style = none
+    hunk-header-decoration-style = blue box ul
+    
+    # Line numbers
+    line-numbers-left-style = cyan
+    line-numbers-right-style = cyan
+    line-numbers-minus-style = red
+    line-numbers-plus-style = green
+    
+    # Blame
+    blame-palette = "#1e1e2e #181825 #11111b #313244"
+    blame-format = "{author:<15} {commit:<8} {timestamp:<15}"
+    
+    # Merge conflicts
+    merge-conflict-begin-symbol = ⟪
+    merge-conflict-end-symbol = ⟫
+    merge-conflict-ours-diff-header-style = yellow bold
+    merge-conflict-theirs-diff-header-style = magenta bold
 
 [interactive]
     diffFilter = delta --color-only
 
-[delta "decorations"]
-    commit-decoration-style = bold yellow box ul
-    file-style = bold yellow ul
-    file-decoration-style = none
+[merge]
+    conflictStyle = zdiff3              # Better conflict markers
+    tool = nvimdiff
 
-[filter "lfs"]
-	clean = git-lfs clean -- %f
-	smudge = git-lfs smudge -- %f
-	process = git-lfs filter-process
-	required = true
+[diff]
+    algorithm = histogram               # Better diff algorithm
+    colorMoved = default                # Highlight moved lines
+    colorMovedWS = allow-indentation-change
 
-[init]
-	defaultBranch = main
+# ------------------------------------------------------------------------------
+# WORKFLOW IMPROVEMENTS
+# ------------------------------------------------------------------------------
+
+[push]
+    followTags = true
+    autoSetupRemote = true
+    default = current
+
+[pull]
+    rebase = true
+
+[fetch]
+    prune = true                        # Auto-cleanup deleted remote branches
+    pruneTags = true
+
+[rebase]
+    autoStash = true                    # Auto stash/unstash during rebase
+    autoSquash = true                   # Auto-squash fixup! commits
+
+[rerere]
+    enabled = true                      # Remember conflict resolutions
+
+[branch]
+    sort = -committerdate               # Show recent branches first
+
+[tag]
+    sort = -version:refname             # Sort tags by version
+
+# ------------------------------------------------------------------------------
+# ALIASES (beyond what's in .zsh_aliases)
+# ------------------------------------------------------------------------------
 
 [alias]
-	appraise = !~/go/bin/git-appraise
-[pull]
-	rebase = true
+    # Quick status
+    s = status -sb
+    
+    # Pretty logs
+    lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+    ll = log --oneline -20
+    lol = log --oneline --graph --all
+    
+    # Recent branches
+    recent = branch --sort=-committerdate --format='%(committerdate:relative)%09%(refname:short)'
+    
+    # Undo last commit (keep changes)
+    undo = reset --soft HEAD~1
+    
+    # Amend without editing message
+    amend = commit --amend --no-edit
+    
+    # Stage all and commit
+    ac = !git add -A && git commit
+    
+    # Interactive rebase on last N commits
+    ri = "!f() { git rebase -i HEAD~${1:-10}; }; f"
+    
+    # Show what I did today
+    today = log --since='midnight' --author='kAldown' --oneline
+    
+    # Show branches merged into current
+    merged = branch --merged
+    
+    # Delete merged branches (except main/master/develop)
+    cleanup = "!git branch --merged | grep -v '\\*\\|main\\|master\\|develop' | xargs -n 1 git branch -d"
+    
+    # Stash shortcuts
+    ss = stash push -m
+    sp = stash pop
+    sl = stash list
+    
+    # Diff shortcuts
+    d = diff
+    ds = diff --staged
+    dc = diff --cached
+    
+    # Find commits by message
+    find = "!f() { git log --oneline --all --grep=\"$1\"; }; f"
+    
+    # Who worked on this file
+    who = shortlog -sn --
+    
+    # Show file at specific commit
+    show-file = "!f() { git show \"$1:$2\"; }; f"
+
+# ------------------------------------------------------------------------------
+# URL SHORTCUTS
+# ------------------------------------------------------------------------------
+
+[url "git@github.com:"]
+    insteadOf = gh:
+    pushInsteadOf = https://github.com/
+
+[url "git@gitlab.com:"]
+    insteadOf = gl:
+
+# ------------------------------------------------------------------------------
+# COLORS
+# ------------------------------------------------------------------------------
+
+[color]
+    ui = true
+
+[color "branch"]
+    current = yellow reverse
+    local = yellow
+    remote = green
+
+[color "status"]
+    added = green
+    changed = yellow
+    untracked = red
+
+# ------------------------------------------------------------------------------
+# LFS
+# ------------------------------------------------------------------------------
+
+[filter "lfs"]
+    clean = git-lfs clean -- %f
+    smudge = git-lfs smudge -- %f
+    process = git-lfs filter-process
+    required = true
