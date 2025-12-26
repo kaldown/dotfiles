@@ -193,6 +193,12 @@ bindkey '^[[F' end-of-line
 bindkey '^A' beginning-of-line
 bindkey '^E' end-of-line
 
+# Edit command line in $EDITOR (Ctrl+x+e)
+autoload -Uz edit-command-line
+zle -N edit-command-line
+bindkey '^x^e' edit-command-line
+bindkey '^xe' edit-command-line
+
 # ══════════════════════════════════════════════════════════════════════════════
 # ALIASES
 # ══════════════════════════════════════════════════════════════════════════════

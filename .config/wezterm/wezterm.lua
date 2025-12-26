@@ -326,4 +326,23 @@ config.audible_bell = 'Disabled'
 config.scroll_to_bottom_on_input = true
 config.term = 'xterm-256color'
 
+-- ════════════════════════════════════════════════════════════════════════════
+-- STARTUP: Half screen, centered
+-- ════════════════════════════════════════════════════════════════════════════
+
+--wezterm.on('gui-startup', function(cmd)
+--  local screen = wezterm.gui.screens().active
+--  local ratio_w = 0.5 -- 50% of screen width
+--  local ratio_h = 0.6 -- 60% of screen height
+--
+--  local width = math.floor(screen.width * ratio_w)
+--  local height = math.floor(screen.height * ratio_h)
+--  local x = math.floor((screen.width - width) / 2)
+--  local y = math.floor((screen.height - height) / 2)
+--
+--  local tab, pane, window = wezterm.mcp.spawn_window(cmd or {})
+--  window:gui_window():set_position(x, y)
+--  window:gui_window():set_inner_size(width, height)
+--end)
+
 return config

@@ -8,6 +8,7 @@
     autocrlf = input
     whitespace = fix,-indent-with-non-tab,trailing-space,cr-at-eol
     excludesfile = ~/.gitignore
+    hooksPath = /Users/kaldown/.git-hooks
 
 [init]
     defaultBranch = main
