@@ -60,7 +60,7 @@ fi
 # Network (safe alternatives)
 (( ${+commands[gping]} )) && alias ping='gping'
 (( ${+commands[dog]} )) && alias dig='dog'
-(( ${+commands[xh]} )) && alias curl='xh'
+#(( ${+commands[xh]} )) && alias curl='xh'
 #(( ${+commands[curlie]} )) && alias curl='curlie'  # curl with colors
 
 # ------------------------------------------------------------------------------
@@ -248,6 +248,5 @@ killport() { lsof -ti :"$1" | xargs kill -9 }
 #   \ps      - original ps (aliased to procs))
 #   \ping      - original ping (aliased to gping))
 #   \dig      - original dig (aliased to dog))
-#   \curl      - original curl (aliased to xh))
 #   command X - always runs original X
 # ------------------------------------------------------------------------------

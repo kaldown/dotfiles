@@ -17,6 +17,9 @@ fi
 # ENVIRONMENT VARIABLES
 # ══════════════════════════════════════════════════════════════════════════════
 
+# For ctrl+w shortuct to read by word, respecting separation
+WORDCHARS='*?[]~&;!#\$%^(){}<>'
+
 export EDITOR=nvim
 export VISUAL=nvim
 export LESS='-FRKX'

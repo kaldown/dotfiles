@@ -1,7 +1,7 @@
 # DOTFILES .gitignore - Ignore everything, whitelist what we track
 
-# Ignore everything by default
-*
+# Ignore everything by default (including project in recursive directories)
+#*
 
 # ═══════════════════════════════════════════════════════════════════
 # TRACK THESE (negate with !)
