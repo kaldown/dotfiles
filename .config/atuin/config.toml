@@ -282,8 +282,23 @@ records = true
 ## Boolean, true or false. If unset, left up to the theme manager.
 # debug = true
 
+# Style and UI
+style = "compact"
+inline_height = 30
+show_preview = true
+enter_accept = true
+
+# Disable live timer updates (fixes mouse selection issues)
+prefers_reduced_motion = true
+
+# Format for `atuin history` CLI command (does NOT affect TUI search)
+history_format = "{command}"
+
+# Search
+search_mode = "fuzzy"
+filter_mode = "global"
+
 [search]
 ## The list of enabled filter modes, in order of priority.
-## The "workspace" mode is skipped when not in a workspace or workspaces = false.
-## Default filter mode can be overridden with the filter_mode setting.
 # filters = [ "global", "host", "session", "session-preload", "workspace", "directory" ]
+

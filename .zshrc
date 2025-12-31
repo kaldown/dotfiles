@@ -254,6 +254,7 @@ if [[ -n "$WEZTERM_PANE" ]]; then
 fi
 
 # atuin (must be last - overrides key bindings)
+export ATUIN_PREFERS_REDUCED_MOTION=true
 eval "$(atuin init zsh)"
 
 # ══════════════════════════════════════════════════════════════════════════════
