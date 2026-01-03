@@ -5,6 +5,8 @@
 # Use short aliases for interactive use. Modern replacements for monitoring tools
 # are safe since scripts rarely use them.
 #
+# Or do not source aliases if $CLAUDECODE == 1 (current approach)
+#
 # CLAUDE CODE / AI AGENTS:
 # - These aliases only load in interactive shells
 # - To bypass any alias, prefix with backslash: \grep, \find, \top
@@ -13,20 +15,14 @@
 # ==============================================================================
 
 # ------------------------------------------------------------------------------
-# MODERN TOOL SHORTCUTS (interactive use - doesn't break scripts)
+# DANGEROUS REPLACEMENTS.
 # ------------------------------------------------------------------------------
 
 # fd - better find
-alias f='fd'
-alias ff='fd --type f'        # files only
-alias fh='fd --hidden'        # include hidden
-alias fa='fd --hidden --no-ignore'  # find absolutely everything
+(( ${+commands[fd]} )) && alias find='fd'
 
 # ripgrep - better grep
-alias g='rg'
-alias gi='rg -i'              # case insensitive
-alias gl='rg -l'              # files only (list)
-alias gv='rg -v'              # invert match
+(( ${+commands[rg]} )) && alias grep='rg'
 
 # ------------------------------------------------------------------------------
 # SAFE REPLACEMENTS (compatible args or rarely used by scripts)
@@ -238,6 +234,8 @@ killport() { lsof -ti :"$1" | xargs kill -9 }
 # ORIGINAL COMMAND ACCESS (for reference)
 # ------------------------------------------------------------------------------
 # These commands are aliased but originals are always available:
+#   \find     - original find (aliased to fd)
+#   \grep     - original grep (aliased to rg)
 #   \top      - original top (aliased to btop)
 #   \df       - original df (aliased to duf)
 #   \du       - original du (aliased to dust)
@@ -245,8 +243,8 @@ killport() { lsof -ti :"$1" | xargs kill -9 }
 #   \cat      - original cat (aliased to batt))
 #   \sed      - original sed (aliased to sd))
 #   \cut      - original cut (aliased to choose))
-#   \ps      - original ps (aliased to procs))
-#   \ping      - original ping (aliased to gping))
+#   \ps       - original ps (aliased to procs))
+#   \ping     - original ping (aliased to gping))
 #   \dig      - original dig (aliased to dog))
 #   command X - always runs original X
 # ------------------------------------------------------------------------------

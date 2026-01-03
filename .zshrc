@@ -200,10 +200,10 @@ bindkey '^x^e' edit-command-line
 bindkey '^xe' edit-command-line
 
 # ══════════════════════════════════════════════════════════════════════════════
-# ALIASES
+# ALIASES (skip for Claude Code - uses standard POSIX tools)
 # ══════════════════════════════════════════════════════════════════════════════
 
-[[ -f ~/.zsh_aliases ]] && source ~/.zsh_aliases
+[[ -f ~/.zsh_aliases ]] && [[ "$CLAUDECODE" != "1" ]] && source ~/.zsh_aliases
 
 # ══════════════════════════════════════════════════════════════════════════════
 # TOOL INTEGRATIONS (after plugins)
@@ -235,8 +235,8 @@ export FZF_DEFAULT_OPTS="
 export FZF_CTRL_T_OPTS="--preview 'bat --color=always --style=numbers --line-range=:500 {} 2>/dev/null || cat {}'"
 export FZF_ALT_C_OPTS="--preview 'eza --tree --color=always --icons {} | head -200'"
 
-# zoxide (smarter cd)
-eval "$(zoxide init zsh --cmd cd)"
+# zoxide (smarter cd) - skip for Claude Code (uses __zoxide_z which breaks on unknown dirs)
+[[ "$CLAUDECODE" != "1" ]] && eval "$(zoxide init zsh --cmd cd)"
 
 # UV completions (cached)
 if [[ ! -f ~/.zsh_uv_completion ]] || [[ ~/.zsh_uv_completion -ot $(which uv) ]]; then
