@@ -248,11 +248,6 @@ fi
 # bun completions
 [[ -s "$HOME/.bun/_bun" ]] && source "$HOME/.bun/_bun"
 
-# WezTerm shell integration (prompt navigation, semantic zones)
-if [[ -n "$WEZTERM_PANE" ]]; then
-  source "/Applications/WezTerm.app/Contents/Resources/wezterm.sh" 2>/dev/null
-fi
-
 # atuin (must be last - overrides key bindings)
 export ATUIN_PREFERS_REDUCED_MOTION=true
 eval "$(atuin init zsh)"

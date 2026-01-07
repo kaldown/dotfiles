@@ -217,11 +217,6 @@ config.keys = {
   { key = '=',     mods = 'CTRL',       action = act.IncreaseFontSize },
   { key = '-',     mods = 'CTRL',       action = act.DecreaseFontSize },
   { key = '0',     mods = 'CTRL',       action = act.ResetFontSize },
-
-  -- ══════════════════════════════════════════════════════════════════════════
-  -- PRESERVED FROM ORIGINAL CONFIG
-  -- ══════════════════════════════════════════════════════════════════════════
-  { key = 'Enter', mods = 'SHIFT',      action = act.SendString '\x1b\r' },
 }
 
 -- Quick tab switching (Leader + 1-9)
