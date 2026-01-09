@@ -122,6 +122,9 @@ zstyle ':completion:*' menu select
 zstyle ':completion:*' group-name ''
 zstyle ':completion:*:descriptions' format '%F{yellow}-- %d --%f'
 
+# Don't backtrack on failed completion
+zstyle ':completion:*' accept-exact-dirs true
+
 # Colors in completion
 zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 
@@ -131,6 +134,7 @@ zstyle ':fzf-tab:*' switch-group '<' '>'
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always --icons $realpath 2>/dev/null || lsd -1 --color=always $realpath'
 zstyle ':fzf-tab:complete:ls:*' fzf-preview 'eza -1 --color=always --icons $realpath 2>/dev/null || lsd -1 --color=always $realpath'
 zstyle ':fzf-tab:*' continuous-trigger '/'
+zstyle ':fzf-tab:*' fzf-flags --exact
 
 # ══════════════════════════════════════════════════════════════════════════════
 # SHELL OPTIONS
