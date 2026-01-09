@@ -203,7 +203,9 @@ bindkey '^xe' edit-command-line
 # ALIASES (skip for Claude Code - uses standard POSIX tools)
 # ══════════════════════════════════════════════════════════════════════════════
 
+# If claude code is the current user then do not source from ~/.zsh_aliases
 [[ -f ~/.zsh_aliases ]] && [[ "$CLAUDECODE" != "1" ]] && source ~/.zsh_aliases
+export ENABLE_LSP_TOOL=true
 
 # ══════════════════════════════════════════════════════════════════════════════
 # TOOL INTEGRATIONS (after plugins)
@@ -263,5 +265,5 @@ alias dotconfig='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 # POWERLEVEL10K CONFIG
 # ══════════════════════════════════════════════════════════════════════════════
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh

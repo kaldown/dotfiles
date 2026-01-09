@@ -71,7 +71,7 @@ config.macos_window_background_blur = 20
 -- ════════════════════════════════════════════════════════════════════════════
 
 config.use_fancy_tab_bar = false
-config.tab_bar_at_bottom = true
+config.tab_bar_at_bottom = false
 config.hide_tab_bar_if_only_one_tab = false
 config.tab_max_width = 32
 
@@ -217,6 +217,11 @@ config.keys = {
   { key = '=',     mods = 'CTRL',       action = act.IncreaseFontSize },
   { key = '-',     mods = 'CTRL',       action = act.DecreaseFontSize },
   { key = '0',     mods = 'CTRL',       action = act.ResetFontSize },
+
+  -- ══════════════════════════════════════════════════════════════════════════
+  -- PRESERVED FROM ORIGINAL CONFIG
+  -- ══════════════════════════════════════════════════════════════════════════
+  { key = 'Enter', mods = 'SHIFT',      action = act.SendString '\x1b\r' },
 }
 
 -- Quick tab switching (Leader + 1-9)
