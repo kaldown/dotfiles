@@ -103,6 +103,11 @@ alias ln='ln -iv'
 # lazydocker
 (( ${+commands[lazydocker]} )) && alias lzd='lazydocker'
 
+# Update Claude Code Docker Sandbox to latest version
+update-claude-sandbox() {
+    ~/.claude/scripts/sandbox/update-claude-sandbox.sh "$@"
+}
+
 # ------------------------------------------------------------------------------
 # PYTHON / UV
 # ------------------------------------------------------------------------------
