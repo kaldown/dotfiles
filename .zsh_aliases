@@ -14,7 +14,7 @@
 # Claude Code security wrapper
 # Auto-injects hookify rules to block file operations outside project directory
 # Templates: ~/.claude/templates/ | Script: ~/.claude/scripts/claude-hooks-injector.sh
-alias claude='~/.claude/scripts/claude-hooks-injector.sh && command claude' 
+#alias claude='~/.claude/scripts/claude-wrapper.sh && command claude' 
 
 # ------------------------------------------------------------------------------
 # SAFE REPLACEMENTS (compatible args or rarely used by scripts)

@@ -203,13 +203,9 @@ zle -N edit-command-line
 bindkey '^x^e' edit-command-line
 bindkey '^xe' edit-command-line
 
-# ══════════════════════════════════════════════════════════════════════════════
-# ALIASES (skip for Claude Code - uses standard POSIX tools)
-# ══════════════════════════════════════════════════════════════════════════════
 
-# If claude code is the current user then do not source from ~/.zsh_aliases
-[[ -f ~/.zsh_aliases ]] && [[ "$CLAUDECODE" != "1" ]] && source ~/.zsh_aliases
-export ENABLE_LSP_TOOL=true
+# source ~/.zsh_aliases if exists
+[[ -f ~/.zsh_aliases ]] && source ~/.zsh_aliases
 
 # ══════════════════════════════════════════════════════════════════════════════
 # TOOL INTEGRATIONS (after plugins)
@@ -271,3 +267,8 @@ alias dotconfig='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
+# The following lines have been added by Docker Desktop to enable Docker CLI completions.
+fpath=($HOME/.docker/completions $fpath)
+autoload -Uz compinit
+compinit
+# End of Docker CLI completions
