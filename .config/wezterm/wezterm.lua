@@ -73,7 +73,7 @@ config.macos_window_background_blur = 20
 config.use_fancy_tab_bar = false
 config.tab_bar_at_bottom = false
 config.hide_tab_bar_if_only_one_tab = false
-config.tab_max_width = 32
+config.tab_max_width = 32  -- Works with formatter to ensure consistent tab width
 
 config.colors = {
   tab_bar = {
@@ -281,6 +281,35 @@ wezterm.on('update-right-status', function(window, _)
   end
 
   window:set_right_status(wezterm.format(cells))
+end)
+
+-- ════════════════════════════════════════════════════════════════════════════
+-- TAB TITLE FORMATTING (Fixed width tabs)
+-- ════════════════════════════════════════════════════════════════════════════
+
+wezterm.on('format-tab-title', function(tab, _, _, _, _, max_width)
+  local title = tab.tab_title
+  -- If no custom title is set, use the active pane title
+  if not title or #title == 0 then
+    title = tab.active_pane.title
+  end
+
+  -- Fixed width for consistent tab sizing (adjust as needed)
+  local fixed_width = 28
+
+  -- Truncate if too long
+  if #title > fixed_width then
+    title = title:sub(1, fixed_width - 1) .. '…'
+  end
+
+  -- Pad if too short to maintain consistent width
+  while #title < fixed_width do
+    title = title .. ' '
+  end
+
+  return {
+    { Text = ' ' .. title .. ' ' },
+  }
 end)
 
 -- ════════════════════════════════════════════════════════════════════════════
