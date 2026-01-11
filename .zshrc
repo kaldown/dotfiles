@@ -14,6 +14,19 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
 fi
 
 # ══════════════════════════════════════════════════════════════════════════════
+# SSH DETECTION FOR P10K MODE SWITCHING
+# ══════════════════════════════════════════════════════════════════════════════
+
+# Detect SSH session - use ASCII mode to avoid broken Unicode in Termux
+if [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" || -n "$SSH_CONNECTION" ]]; then
+  # SSH session - use ASCII characters only
+  export POWERLEVEL9K_MODE='ascii'
+else
+  # Local session - use nerdfont with Unicode icons
+  export POWERLEVEL9K_MODE='nerdfont-v3'
+fi
+
+# ══════════════════════════════════════════════════════════════════════════════
 # ENVIRONMENT VARIABLES
 # ══════════════════════════════════════════════════════════════════════════════
 
@@ -23,6 +36,20 @@ WORDCHARS='*?[]~&;!#\$%^(){}<>'
 export EDITOR=nvim
 export VISUAL=nvim
 export LESS='-FRKX'
+
+# ══════════════════════════════════════════════════════════════════════════════
+# TERM HANDLING FOR TMUX AND REMOTE CONNECTIONS
+# ══════════════════════════════════════════════════════════════════════════════
+
+# Fix TERM when in tmux without proper 256-color detection
+if [[ "$TERM" == "screen" && -n "$TMUX" ]]; then
+  export TERM=screen-256color
+fi
+
+# Enable truecolor support where available
+if [[ -n "$COLORTERM" ]]; then
+  export COLORTERM=truecolor
+fi
 
 # History configuration
 HISTFILE=~/.zsh_history
