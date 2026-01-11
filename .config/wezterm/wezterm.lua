@@ -297,8 +297,25 @@ config.quick_select_patterns = {
 }
 
 -- ════════════════════════════════════════════════════════════════════════════
+-- HYPERLINK RULES
+-- ════════════════════════════════════════════════════════════════════════════
+
+-- Use WezTerm's default hyperlink rules as base
+config.hyperlink_rules = wezterm.default_hyperlink_rules()
+
+-- Add custom rule for repository patterns (user/repo -> github.com/user/repo)
+table.insert(config.hyperlink_rules, {
+  regex = [[["]?([\w\d]{1}[-\w\d]+)(/){1}([-\w\d\.]+)["]?]],
+  format = 'https://www.github.com/$1/$3',
+})
+
+-- ════════════════════════════════════════════════════════════════════════════
 -- MOUSE & CLIPBOARD
 -- ════════════════════════════════════════════════════════════════════════════
+
+-- Allow SHIFT key to bypass tmux mouse mode for text selection
+-- This is the default, but we set it explicitly for clarity
+config.bypass_mouse_reporting_modifiers = 'SHIFT'
 
 config.mouse_bindings = {
   {

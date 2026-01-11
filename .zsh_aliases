@@ -108,6 +108,9 @@ update-claude-sandbox() {
     ~/.claude/scripts/sandbox/update-claude-sandbox.sh "$@"
 }
 
+# Claude sandbox with persistent volume and Docker access
+alias claude-sandbox='docker sandbox run --mount-docker-socket claude'
+
 # ------------------------------------------------------------------------------
 # PYTHON / UV
 # ------------------------------------------------------------------------------
@@ -123,14 +126,9 @@ alias activate='source .venv/bin/activate'
 (( ${+commands[tokei]} )) && alias loc='tokei'
 (( ${+commands[scc]} )) && alias scc='scc'
 
-# Benchmarking: time → hyperfine wrapper (same syntax)
-time() {
-  if (( ${+commands[hyperfine]} )); then
-    hyperfine "$*"
-  else
-    command time "$@"
-  fi
-}
+# Benchmarking: Use 'bench' alias instead of overriding 'time'
+# (hyperfine and time have incompatible syntax)
+(( ${+commands[hyperfine]} )) && alias bench='hyperfine'
 
 # JSON/YAML
 (( ${+commands[jq]} )) && alias jq='jq'

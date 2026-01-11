@@ -184,6 +184,8 @@ setopt AUTO_CD                   # cd by typing directory name
 setopt AUTO_PUSHD                # Push directories onto stack
 setopt PUSHD_IGNORE_DUPS         # Don't push duplicates
 setopt PUSHD_SILENT              # Don't print stack after pushd/popd
+setopt COMPLETE_IN_WORD          # Complete from both ends of word
+setopt PATH_DIRS                 # Perform path search even on command names with slashes
 
 # Globbing & expansion
 setopt EXTENDED_GLOB             # Extended globbing (#, ~, ^)
@@ -234,6 +236,24 @@ bindkey '^xe' edit-command-line
 # source ~/.zsh_aliases if exists
 [[ -f ~/.zsh_aliases ]] && source ~/.zsh_aliases
 
+# Fix completion for aliased commands (ls -> eza)
+# Use global alias expansion so completion sees the underlying command
+setopt NO_COMPLETE_ALIASES
+
+# Set up completion to treat these as file/directory commands
+if (( ${+commands[eza]} )); then
+  # Force these aliases to use standard file completion
+  compdef -d ls la ll lt lg l1 lm lsize 2>/dev/null  # Delete any existing
+  compdef _files ls
+  compdef _files la
+  compdef _files ll
+  compdef _files lt
+  compdef _files lg
+  compdef _files l1
+  compdef _files lm
+  compdef _files lsize
+fi
+
 # ══════════════════════════════════════════════════════════════════════════════
 # TOOL INTEGRATIONS (after plugins)
 # ══════════════════════════════════════════════════════════════════════════════
@@ -270,7 +290,8 @@ export FZF_ALT_C_OPTS="--preview 'eza --tree --color=always --icons {} | head -2
 # UV completions (cached)
 if [[ ! -f ~/.zsh_uv_completion ]] || [[ ~/.zsh_uv_completion -ot $(which uv) ]]; then
   uv generate-shell-completion zsh > ~/.zsh_uv_completion 2>/dev/null
-  uvx --generate-shell-completion zsh >> ~/.zsh_uv_completion 2>/dev/null
+  # uvx doesn't have --generate-shell-completion flag, only uv does
+  # uvx --generate-shell-completion zsh >> ~/.zsh_uv_completion 2>/dev/null
 fi
 [[ -f ~/.zsh_uv_completion ]] && source ~/.zsh_uv_completion
 
@@ -294,8 +315,4 @@ alias dotconfig='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
-# The following lines have been added by Docker Desktop to enable Docker CLI completions.
-fpath=($HOME/.docker/completions $fpath)
-autoload -Uz compinit
-compinit
-# End of Docker CLI completions
+
