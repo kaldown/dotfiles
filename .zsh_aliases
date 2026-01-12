@@ -108,8 +108,13 @@ update-claude-sandbox() {
     ~/.claude/scripts/sandbox/update-claude-sandbox.sh "$@"
 }
 
-# Claude sandbox with persistent volume and Docker access
-alias claude-sandbox='docker sandbox run --mount-docker-socket claude'
+# Sync plugins from host to Docker sandbox (fixes paths, scope, orphan markers)
+sync-claude-plugins() {
+    ~/.claude/scripts/sandbox/sync-plugins.sh "$@"
+}
+
+# Claude sandbox with persistent plugins volume
+alias claude-sandbox='docker sandbox run -v docker-claude-plugins:/home/agent/.claude/plugins --mount-docker-socket claude'
 
 # ------------------------------------------------------------------------------
 # PYTHON / UV
