@@ -30,8 +30,9 @@ fi
 # ENVIRONMENT VARIABLES
 # ══════════════════════════════════════════════════════════════════════════════
 
-# For ctrl+w shortuct to read by word, respecting separation
-WORDCHARS='*?[]~&;!#\$%^(){}<>'
+# For ctrl+w shortcut to delete by word, respecting separation
+# Removed: # (comments), / (paths), - (flags) so they act as word boundaries
+WORDCHARS='*?[]~&;!\$%^(){}<>'
 
 export EDITOR=nvim
 export VISUAL=nvim
@@ -139,8 +140,14 @@ zinit light zsh-users/zsh-syntax-highlighting
 # COMPLETION STYLES
 # ══════════════════════════════════════════════════════════════════════════════
 
-# Case-insensitive completion
-zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
+# Fuzzy completion matching:
+# 1. Case-insensitive
+# 2. Partial-word matching
+# 3. Substring matching anywhere
+zstyle ':completion:*' matcher-list \
+  'm:{a-zA-Z}={A-Za-z}' \
+  'r:|[._-]=* r:|=*' \
+  'l:|=* r:|=*'
 
 # Use menu selection
 zstyle ':completion:*' menu select
@@ -158,10 +165,11 @@ zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 # fzf-tab configuration
 zstyle ':fzf-tab:*' fzf-command fzf
 zstyle ':fzf-tab:*' switch-group '<' '>'
-zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always --icons $realpath 2>/dev/null || lsd -1 --color=always $realpath'
-zstyle ':fzf-tab:complete:ls:*' fzf-preview 'eza -1 --color=always --icons $realpath 2>/dev/null || lsd -1 --color=always $realpath'
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always --icons $realpath 2>/dev/null || ls -1 $realpath'
+zstyle ':fzf-tab:complete:ls:*' fzf-preview 'eza -1 --color=always --icons $realpath 2>/dev/null || ls -1 $realpath'
+zstyle ':fzf-tab:complete:eza:*' fzf-preview 'eza -1 --color=always --icons $realpath 2>/dev/null || ls -1 $realpath'
 zstyle ':fzf-tab:*' continuous-trigger '/'
-zstyle ':fzf-tab:*' fzf-flags --exact
+# Removed --exact to enable fuzzy matching in fzf-tab
 
 # ══════════════════════════════════════════════════════════════════════════════
 # SHELL OPTIONS
@@ -243,7 +251,8 @@ setopt NO_COMPLETE_ALIASES
 # Set up completion to treat these as file/directory commands
 if (( ${+commands[eza]} )); then
   # Force these aliases to use standard file completion
-  compdef -d ls la ll lt lg l1 lm lsize 2>/dev/null  # Delete any existing
+  compdef -d ls la ll lt lg l1 lm lsize eza 2>/dev/null  # Delete any existing
+  compdef _files eza
   compdef _files ls
   compdef _files la
   compdef _files ll
