@@ -240,7 +240,6 @@ zle -N edit-command-line
 bindkey '^x^e' edit-command-line
 bindkey '^xe' edit-command-line
 
-
 # source ~/.zsh_aliases if exists
 [[ -f ~/.zsh_aliases ]] && source ~/.zsh_aliases
 
@@ -261,6 +260,7 @@ if (( ${+commands[eza]} )); then
   compdef _files l1
   compdef _files lm
   compdef _files lsize
+  compdef dotconfig=git
 fi
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -311,12 +311,6 @@ fi
 export ATUIN_PREFERS_REDUCED_MOTION=true
 eval "$(atuin init zsh)"
 
-# ══════════════════════════════════════════════════════════════════════════════
-# DOTFILES MANAGEMENT (bare git repo)
-# ══════════════════════════════════════════════════════════════════════════════
-
-# Manage dotfiles with: config status, config add, config commit, config push
-alias dotconfig='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 
 # ══════════════════════════════════════════════════════════════════════════════
 # POWERLEVEL10K CONFIG

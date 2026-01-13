@@ -93,6 +93,10 @@ alias ln='ln -iv'
 # GIT
 # ------------------------------------------------------------------------------
 
+# DOTFILES MANAGEMENT (bare git repo)
+# Manage dotfiles with: config status, config add, config commit, config push
+alias dotconfig='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
+
 # lazygit
 (( ${+commands[lazygit]} )) && alias lzg='lazygit'
 
