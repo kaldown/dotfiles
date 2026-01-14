@@ -48,7 +48,7 @@ local config = wezterm.config_builder()
 
 config.color_scheme = 'Catppuccin Macchiato'
 -- config.font = wezterm.font('Hack Nerd Font Mono', { weight = 'Regular' })
-config.font = wezterm.font('JetBrains Mono')
+config.font = wezterm.font('JetBrainsMono Nerd Font')
 config.font_size = 14.0
 config.line_height = 1.2
 config.cell_width = 1.0

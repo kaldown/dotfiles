@@ -107,18 +107,13 @@ alias dotconfig='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 # lazydocker
 (( ${+commands[lazydocker]} )) && alias lzd='lazydocker'
 
-# Update Claude Code Docker Sandbox to latest version
-update-claude-sandbox() {
-    ~/.claude/scripts/sandbox/update-claude-sandbox.sh "$@"
-}
-
 # Sync plugins from host to Docker sandbox (fixes paths, scope, orphan markers)
 sync-claude-plugins() {
     ~/.claude/scripts/sandbox/sync-plugins.sh "$@"
 }
 
 # Claude sandbox with persistent plugins volume
-alias claude-sandbox='docker sandbox run -v docker-claude-plugins:/home/agent/.claude/plugins --mount-docker-socket claude'
+alias claude-sandbox='docker sandbox run -v docker-claude-plugins:/home/agent/.claude/plugins claude'
 
 # ------------------------------------------------------------------------------
 # PYTHON / UV
@@ -126,6 +121,7 @@ alias claude-sandbox='docker sandbox run -v docker-claude-plugins:/home/agent/.c
 
 alias venv='uv venv'
 alias activate='source .venv/bin/activate'
+alias ipython='uv run --with "catppuccin[pygments]" --with ipython -- ipython'
 
 # ------------------------------------------------------------------------------
 # DEV TOOLS
