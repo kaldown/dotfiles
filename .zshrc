@@ -92,14 +92,8 @@ fpath=(
   $HOME/.docker/completions
   $fpath
 )
-
-# Cached compinit - only regenerate once per day
 autoload -Uz compinit
-if [[ -n ~/.zcompdump(#qN.mh+24) ]]; then
-  compinit
-else
-  compinit -C
-fi
+compinit
 
 # ══════════════════════════════════════════════════════════════════════════════
 # ZINIT SETUP
