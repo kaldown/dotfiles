@@ -14,6 +14,7 @@
 --
 -- NAVIGATION:
 --   CTRL+SHIFT + h/j/k/l    Move between panes
+--   CMD + h/j/k/l           Move between panes (alt)
 --
 -- RESIZE MODE:
 --   Leader + r     Enter resize mode
@@ -23,6 +24,7 @@
 -- TABS:
 --   Leader + c     New tab
 --   Leader + n/p   Next/prev tab
+--   CMD + ←/→      Next/prev tab (alt)
 --   Leader + 1-9   Jump to tab N
 --   Leader + ,     Rename tab
 --   Leader + &     Close tab
@@ -144,6 +146,10 @@ config.keys = {
   { key = 'j',     mods = 'CTRL|SHIFT',   action = act.ActivatePaneDirection 'Down' },
   { key = 'k',     mods = 'CTRL|SHIFT',   action = act.ActivatePaneDirection 'Up' },
   { key = 'l',     mods = 'CTRL|SHIFT',   action = act.ActivatePaneDirection 'Right' },
+  { key = 'h',     mods = 'SUPER',        action = act.ActivatePaneDirection 'Left' },
+  { key = 'j',     mods = 'SUPER',        action = act.ActivatePaneDirection 'Down' },
+  { key = 'k',     mods = 'SUPER',        action = act.ActivatePaneDirection 'Up' },
+  { key = 'l',     mods = 'SUPER',        action = act.ActivatePaneDirection 'Right' },
 
   -- ══════════════════════════════════════════════════════════════════════════
   -- PANE MANAGEMENT
@@ -166,9 +172,11 @@ config.keys = {
   -- ══════════════════════════════════════════════════════════════════════════
   -- TABS
   -- ══════════════════════════════════════════════════════════════════════════
-  { key = 'c', mods = 'LEADER',       action = act.SpawnTab 'CurrentPaneDomain' },
-  { key = 'n', mods = 'LEADER',       action = act.ActivateTabRelative(1) },
-  { key = 'p', mods = 'LEADER',       action = act.ActivateTabRelative(-1) },
+  { key = 'c',          mods = 'LEADER', action = act.SpawnTab 'CurrentPaneDomain' },
+  { key = 'n',          mods = 'LEADER', action = act.ActivateTabRelative(1) },
+  { key = 'p',          mods = 'LEADER', action = act.ActivateTabRelative(-1) },
+  { key = 'LeftArrow',  mods = 'SUPER',  action = act.ActivateTabRelative(-1) },
+  { key = 'RightArrow', mods = 'SUPER',  action = act.ActivateTabRelative(1) },
   { key = '&', mods = 'LEADER|SHIFT', action = act.CloseCurrentTab { confirm = true } },
   {
     key = ',',

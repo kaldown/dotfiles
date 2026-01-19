@@ -293,7 +293,8 @@ store_failed = false
 history_format = "{command}"
 
 # Search
-search_mode = "fuzzy"
+search_mode = "prefix"
+search_mode_shell_up_key_binding = "prefix"
 filter_mode = "global"
 
 [search]
