@@ -48,10 +48,38 @@ if git rev-parse --is-inside-work-tree &>/dev/null; then
     fi
 fi
 
-# Model name
+# Fast mode and effort level from settings/env
+SETTINGS_FILE="$HOME/.claude/settings.json"
+FAST_ENABLED="false"
+EFFORT_SETTING="high"
+
+if [ -f "$SETTINGS_FILE" ]; then
+    FAST_ENABLED=$(jq -r '.fastMode // false' "$SETTINGS_FILE" 2>/dev/null)
+    EFFORT_FROM_SETTINGS=$(jq -r '.effortLevel // empty' "$SETTINGS_FILE" 2>/dev/null)
+    [ -n "$EFFORT_FROM_SETTINGS" ] && EFFORT_SETTING="$EFFORT_FROM_SETTINGS"
+fi
+
+# Env var overrides settings for effort
+[ -n "$CLAUDE_CODE_EFFORT_LEVEL" ] && EFFORT_SETTING="$CLAUDE_CODE_EFFORT_LEVEL"
+
+# Build effort indicator (always shown)
+case "$EFFORT_SETTING" in
+    low)    EFFORT_INFO="${DIM}[${RED}effort:low${RESET}${DIM}]${RESET}" ;;
+    medium) EFFORT_INFO="${DIM}[${YELLOW}effort:med${RESET}${DIM}]${RESET}" ;;
+    *)      EFFORT_INFO="${DIM}[${GREEN}effort:high${RESET}${DIM}]${RESET}" ;;
+esac
+
+# Speed indicator: lightning for fast, turtle for standard
+if [ "$FAST_ENABLED" = "true" ]; then
+    SPEED_ICON="${YELLOW}↯${RESET}"
+else
+    SPEED_ICON="🐢"
+fi
+
+# Model name with speed and effort
 MODEL_INFO=""
 if [ -n "$MODEL" ]; then
-    MODEL_INFO=" ${DIM}[${MAGENTA}${MODEL}${RESET}${DIM}]${RESET}"
+    MODEL_INFO=" ${DIM}[${MAGENTA}${MODEL}${RESET} ${SPEED_ICON}${DIM}]${RESET} ${EFFORT_INFO}"
 fi
 
 # Context remaining percentage
