@@ -18,6 +18,7 @@ INPUT=$(cat)
 
 # Parse JSON fields
 MODEL=$(echo "$INPUT" | jq -r '.model.display_name // empty')
+SESSION_ID=$(echo "$INPUT" | jq -r '.session_id // empty')
 CWD=$(echo "$INPUT" | jq -r '.cwd // empty')
 CONTEXT_SIZE=$(echo "$INPUT" | jq -r '.context_window.context_window_size // 0')
 CURRENT_INPUT=$(echo "$INPUT" | jq -r '.context_window.current_usage.input_tokens // 0')
@@ -96,4 +97,10 @@ if [ "$CONTEXT_SIZE" -gt 0 ] 2>/dev/null; then
     fi
 fi
 
-echo -e "${USER_HOST}:${DIR}${GIT_INFO}${MODEL_INFO}${CTX_INFO}"
+# Session ID (full, for cross-session resume)
+SESSION_INFO=""
+if [ -n "$SESSION_ID" ]; then
+    SESSION_INFO=" ${DIM}[sid:${CYAN}${SESSION_ID}${RESET}${DIM}]${RESET}"
+fi
+
+echo -e "${USER_HOST}:${DIR}${GIT_INFO}${MODEL_INFO}${CTX_INFO}${SESSION_INFO}"
