@@ -1,101 +1,60 @@
 -- WezTerm Config - kaldown
 -- Leader: CTRL+Space | Splits: |/- | Nav: CTRL+SHIFT+hjkl | Resize: Leader+r
---
--- KEYBINDINGS CHEATSHEET:
--- ═══════════════════════════════════════════════════════════════════════════
--- LEADER = CTRL+Space (1 second timeout)
---
--- SPLITS:
---   Leader + |     Split right (horizontal)
---   Leader + -     Split down (vertical)
---   Leader + z     Zoom/unzoom pane
---   Leader + x     Close pane
---   Leader + w     Visual pane selector
---
--- NAVIGATION:
---   CTRL+SHIFT + h/j/k/l    Move between panes
---   CMD + h/j/k/l           Move between panes (alt)
---
--- RESIZE MODE:
---   Leader + r     Enter resize mode
---   h/j/k/l        Resize in direction
---   Escape/q       Exit resize mode
---
--- TABS:
---   Leader + c     New tab
---   Leader + n/p   Next/prev tab
---   CMD + ←/→      Next/prev tab (alt)
---   Leader + 1-9   Jump to tab N
---   Leader + ,     Rename tab
---   Leader + &     Close tab
---
--- WORKSPACES:
---   Leader + s     Fuzzy workspace picker
---   Leader + S     Create new workspace
---
--- UTILITIES:
---   Leader + [     Copy mode (vim-style)
---   Leader + f     Search
---   CTRL+SHIFT+P   Command palette
---   CTRL+SHIFT+Space   Quick select (URLs, paths, hashes)
--- ═══════════════════════════════════════════════════════════════════════════
 
 local wezterm = require 'wezterm'
 local act = wezterm.action
 local config = wezterm.config_builder()
 
 -- ════════════════════════════════════════════════════════════════════════════
+-- STABILITY: Use OpenGL backend to avoid WebGpu/Metal crashes on macOS
+-- See: https://github.com/wezterm/wezterm/issues/7118
+-- ════════════════════════════════════════════════════════════════════════════
+
+config.front_end = 'OpenGL'
+
+-- ════════════════════════════════════════════════════════════════════════════
 -- APPEARANCE
 -- ════════════════════════════════════════════════════════════════════════════
 
 config.color_scheme = 'Catppuccin Macchiato'
--- config.font = wezterm.font('Hack Nerd Font Mono', { weight = 'Regular' })
 config.font = wezterm.font('JetBrainsMono Nerd Font')
 config.font_size = 14.0
 config.line_height = 1.2
-config.cell_width = 1.0
-config.freetype_load_target = 'Light' -- or 'Normal', 'HorizontalLcd'
-config.freetype_render_target = 'HorizontalLcd'
-config.custom_block_glyphs = false
 
--- Window size and position
-config.initial_cols = 180
-config.initial_rows = 50
-config.window_decorations = 'TITLE | RESIZE'
+-- Disable shadows (linked to macOS crashes), keep resize handles
+config.window_decorations = 'MACOS_FORCE_DISABLE_SHADOW | RESIZE'
 config.window_padding = { left = 5, right = 5, top = 5, bottom = 5 }
 
--- M1 Pro: Enable transparency and blur
-config.window_background_opacity = 0.92
-config.macos_window_background_blur = 20
+-- Transparency without blur (blur stresses GPU on sleep/wake cycles)
+config.window_background_opacity = 0.95
 
 -- ════════════════════════════════════════════════════════════════════════════
--- TAB BAR (bottom, Catppuccin Macchiato styled)
+-- TAB BAR
 -- ════════════════════════════════════════════════════════════════════════════
 
 config.use_fancy_tab_bar = false
-config.tab_bar_at_bottom = false
 config.hide_tab_bar_if_only_one_tab = false
-config.tab_max_width = 32 -- Works with formatter to ensure consistent tab width
+config.tab_max_width = 32
 
 config.colors = {
   tab_bar = {
     background = '#1e2030',
     active_tab = {
-      bg_color = '#c6a0f6', -- Mauve
+      bg_color = '#c6a0f6',
       fg_color = '#1e2030',
       intensity = 'Bold',
     },
     inactive_tab = {
-      bg_color = '#363a4f', -- Surface0
-      fg_color = '#cad3f5', -- Text
+      bg_color = '#363a4f',
+      fg_color = '#cad3f5',
     },
     inactive_tab_hover = {
-      bg_color = '#494d64', -- Surface1
+      bg_color = '#494d64',
       fg_color = '#cad3f5',
     },
     new_tab = {
       bg_color = '#1e2030',
-      fg_color = '#6e738d', -- Overlay0
+      fg_color = '#6e738d',
     },
     new_tab_hover = {
       bg_color = '#494d64',
@@ -104,19 +63,18 @@ config.colors = {
   },
 }
 
--- Inactive panes slightly dimmed
 config.inactive_pane_hsb = {
   saturation = 0.9,
   brightness = 0.7,
 }
 
 -- ════════════════════════════════════════════════════════════════════════════
--- PERFORMANCE
+-- PERFORMANCE (tuned for stability with many Claude Code sessions)
 -- ════════════════════════════════════════════════════════════════════════════
 
-config.max_fps = 120
-config.animation_fps = 60
-config.scrollback_lines = 10000
+config.max_fps = 60
+config.animation_fps = 10
+config.scrollback_lines = 5000
 config.enable_scroll_bar = false
 
 -- ════════════════════════════════════════════════════════════════════════════
@@ -209,27 +167,12 @@ config.keys = {
   },
 
   -- ══════════════════════════════════════════════════════════════════════════
-  -- COPY/PASTE & UTILITIES
+  -- UTILITIES
   -- ══════════════════════════════════════════════════════════════════════════
-  { key = 'c',     mods = 'SUPER',      action = act.CopyTo 'Clipboard' },
-  { key = 'v',     mods = 'SUPER',      action = act.PasteFrom 'Clipboard' },
   { key = '[',     mods = 'LEADER',     action = act.ActivateCopyMode },
   { key = 'f',     mods = 'LEADER',     action = act.Search 'CurrentSelectionOrEmptyString' },
   { key = 'P',     mods = 'CTRL|SHIFT', action = act.ActivateCommandPalette },
   { key = 'Space', mods = 'CTRL|SHIFT', action = act.QuickSelect },
-
-  -- ══════════════════════════════════════════════════════════════════════════
-  -- ══════════════════════════════════════════════════════════════════════════
-  -- FONT SIZE
-  -- ══════════════════════════════════════════════════════════════════════════
-  { key = '=',     mods = 'CTRL',       action = act.IncreaseFontSize },
-  { key = '-',     mods = 'CTRL',       action = act.DecreaseFontSize },
-  { key = '0',     mods = 'CTRL',       action = act.ResetFontSize },
-
-  -- ══════════════════════════════════════════════════════════════════════════
-  -- PRESERVED FROM ORIGINAL CONFIG
-  -- ══════════════════════════════════════════════════════════════════════════
-  { key = 'Enter', mods = 'SHIFT',      action = act.SendString '\x1b\r' },
 }
 
 -- Quick tab switching (Leader + 1-9)
@@ -255,9 +198,9 @@ config.key_tables = {
     { key = 'DownArrow',  action = act.AdjustPaneSize { 'Down', 2 } },
     { key = 'UpArrow',    action = act.AdjustPaneSize { 'Up', 2 } },
     { key = 'RightArrow', action = act.AdjustPaneSize { 'Right', 2 } },
-    { key = 'Escape',     action = 'PopKeyTable' },
-    { key = 'Enter',      action = 'PopKeyTable' },
-    { key = 'q',          action = 'PopKeyTable' },
+    { key = 'Escape',     action = act.PopKeyTable },
+    { key = 'Enter',      action = act.PopKeyTable },
+    { key = 'q',          action = act.PopKeyTable },
   },
 }
 
@@ -305,14 +248,10 @@ wezterm.on('format-tab-title', function(tab, _, _, _, _, max_width)
   -- Fixed width for consistent tab sizing (adjust as needed)
   local fixed_width = 28
 
-  -- Truncate if too long
   if #title > fixed_width then
     title = title:sub(1, fixed_width - 1) .. '…'
-  end
-
-  -- Pad if too short to maintain consistent width
-  while #title < fixed_width do
-    title = title .. ' '
+  else
+    title = string.format('%-' .. fixed_width .. 's', title)
   end
 
   return {
@@ -321,64 +260,12 @@ wezterm.on('format-tab-title', function(tab, _, _, _, _, max_width)
 end)
 
 -- ════════════════════════════════════════════════════════════════════════════
--- QUICK SELECT PATTERNS (Developer-focused)
+-- QUICK SELECT PATTERNS
 -- ════════════════════════════════════════════════════════════════════════════
 
 config.quick_select_patterns = {
-  -- File paths with line numbers (file.rs:42:15)
-  '[\\w\\-./]+\\.[a-zA-Z]+:\\d+(?::\\d+)?',
-  -- Git short hashes
-  '[0-9a-f]{7,40}',
-  -- Semantic versions
-  'v?\\d+\\.\\d+\\.\\d+(?:-[a-zA-Z0-9.]+)?',
-}
-
--- ════════════════════════════════════════════════════════════════════════════
--- HYPERLINK RULES (URLs only - file paths are not clickable)
--- ════════════════════════════════════════════════════════════════════════════
-
-config.hyperlink_rules = {
-  -- Explicit http/https URLs
-  {
-    regex = [=[\bhttps?://[^\s<>"{}|\\^`\[\]]+]=],
-    format = '$0',
-  },
-  -- Mailto links
-  {
-    regex = [=[\bmailto:[^\s<>"{}|\\^`\[\]]+]=],
-    format = '$0',
-  },
-  -- file:// URLs
-  {
-    regex = [=[\bfile://[^\s<>"{}|\\^`\[\]]+]=],
-    format = '$0',
-  },
-}
-
--- ════════════════════════════════════════════════════════════════════════════
--- MOUSE & CLIPBOARD
--- ════════════════════════════════════════════════════════════════════════════
-
--- Allow SHIFT key to bypass tmux mouse mode for text selection
--- This is the default, but we set it explicitly for clarity
-config.bypass_mouse_reporting_modifiers = 'SHIFT'
-
-config.mouse_bindings = {
-  {
-    event = { Up = { streak = 1, button = 'Left' } },
-    mods = 'NONE',
-    action = act.CompleteSelectionOrOpenLinkAtMouseCursor 'Clipboard',
-  },
-  {
-    event = { Up = { streak = 2, button = 'Left' } },
-    mods = 'NONE',
-    action = act.CompleteSelection 'Clipboard',
-  },
-  {
-    event = { Up = { streak = 3, button = 'Left' } },
-    mods = 'NONE',
-    action = act.CompleteSelection 'Clipboard',
-  },
+  '[\\w\\-./]+\\.[a-zA-Z]+:\\d+(?::\\d+)?', -- file:line:col
+  '[0-9a-f]{7,40}',                          -- git hashes
 }
 
 -- ════════════════════════════════════════════════════════════════════════════
@@ -386,26 +273,6 @@ config.mouse_bindings = {
 -- ════════════════════════════════════════════════════════════════════════════
 
 config.audible_bell = 'Disabled'
-config.scroll_to_bottom_on_input = true
 config.term = 'xterm-256color'
-
--- ════════════════════════════════════════════════════════════════════════════
--- STARTUP: Half screen, centered
--- ════════════════════════════════════════════════════════════════════════════
-
---wezterm.on('gui-startup', function(cmd)
---  local screen = wezterm.gui.screens().active
---  local ratio_w = 0.5 -- 50% of screen width
---  local ratio_h = 0.6 -- 60% of screen height
---
---  local width = math.floor(screen.width * ratio_w)
---  local height = math.floor(screen.height * ratio_h)
---  local x = math.floor((screen.width - width) / 2)
---  local y = math.floor((screen.height - height) / 2)
---
---  local tab, pane, window = wezterm.mcp.spawn_window(cmd or {})
---  window:gui_window():set_position(x, y)
---  window:gui_window():set_inner_size(width, height)
---end)
 
 return config
