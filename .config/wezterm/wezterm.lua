@@ -22,7 +22,7 @@ config.font_size = 14.0
 config.line_height = 1.2
 
 -- Disable shadows (linked to macOS crashes), keep resize handles
-config.window_decorations = 'MACOS_FORCE_DISABLE_SHADOW | RESIZE'
+config.window_decorations = 'TITLE | RESIZE | MACOS_FORCE_DISABLE_SHADOW'
 config.window_padding = { left = 5, right = 5, top = 5, bottom = 5 }
 
 -- Transparency without blur (blur stresses GPU on sleep/wake cycles)
