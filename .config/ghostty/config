@@ -1,120 +1,113 @@
 # ═══════════════════════════════════════════════════════════════════════════
-# TMUX CONFIGURATION - Claude Code Teammate Mode + Catppuccin Macchiato
+# GHOSTTY CONFIGURATION - Catppuccin Macchiato + SAND Keybindings
 # ═══════════════════════════════════════════════════════════════════════════
-# Optimized for Claude Code agent teams running inside Ghostty
+# File: ~/.config/ghostty/config
+# Reload: Cmd+Shift+, (macOS)
+# SAND: Split, Across, Navigate, Destroy
+# Based on: github.com/davila7 (adapted for Claude Code teammate mode)
 
 # ───────────────────────────────────────────────────────────────────────────
-# CLAUDE CODE — CRITICAL SETTINGS
+# TYPOGRAPHY
 # ───────────────────────────────────────────────────────────────────────────
 
-# Passthrough: allows Claude Code notifications + progress bar to reach Ghostty
-set -g allow-passthrough on
-
-# Extended keys: enables Shift+Down to cycle between teammates
-set -g extended-keys on
-set -as terminal-features ',xterm*:extkeys'
-
-# Clipboard: OSC 52 clipboard sharing through tmux
-set -g set-clipboard on
+font-family = JetBrainsMono Nerd Font
+font-size = 14
+font-thicken = true
+adjust-cell-height = 2
 
 # ───────────────────────────────────────────────────────────────────────────
-# TRUE COLOR & TERMINAL SUPPORT
+# THEME & APPEARANCE
 # ───────────────────────────────────────────────────────────────────────────
 
-set -g default-terminal "tmux-256color"
+# Catppuccin Macchiato (dark) / Latte (light) - auto-switches with macOS
+theme = light:Catppuccin Latte,dark:Catppuccin Macchiato
 
-# RGB truecolor (tmux 3.2+)
-set -as terminal-features ",tmux-256color:RGB"
-set -as terminal-overrides ",*:Tc"
+# Window
+macos-titlebar-style = transparent
+window-padding-x = 5
+window-padding-y = 5
+window-save-state = always
+window-theme = auto
 
-# Ghostty-specific: proper RGB + extended keys for xterm-ghostty
-set -as terminal-overrides ",xterm-ghostty:RGB"
-
-# OSC 8 hyperlinks (tmux 3.4+)
-set -as terminal-features ",*:hyperlinks"
-
-# ───────────────────────────────────────────────────────────────────────────
-# INPUT & RESPONSIVENESS
-# ───────────────────────────────────────────────────────────────────────────
-
-# Zero escape delay for responsive input
-set -sg escape-time 0
-
-# Mouse: scroll, click into panes, resize
-set -g mouse on
-
-# Focus events for TUI tracking
-set -g focus-events on
+# Cursor
+cursor-style = bar
+cursor-style-blink = true
 
 # ───────────────────────────────────────────────────────────────────────────
-# SCROLLBACK
+# INPUT & MOUSE
 # ───────────────────────────────────────────────────────────────────────────
 
-# 250K lines — Claude Code streams rapidly during long sessions
-set -g history-limit 250000
+mouse-hide-while-typing = true
+copy-on-select = clipboard
 
 # ───────────────────────────────────────────────────────────────────────────
-# KEY BINDINGS
+# QUICK TERMINAL (Quake-style dropdown: Ctrl+`)
 # ───────────────────────────────────────────────────────────────────────────
 
-# Prefix: C-] (avoids readline conflicts)
-unbind C-b
-set -g prefix C-]
-bind C-] send-prefix
+quick-terminal-position = top
+quick-terminal-screen = mouse
+quick-terminal-autohide = true
+quick-terminal-animation-duration = 0.15
 
-# Split panes
-bind | split-window -h
-bind - split-window -v
-unbind '"'
-unbind %
+# ───────────────────────────────────────────────────────────────────────────
+# SECURITY
+# ───────────────────────────────────────────────────────────────────────────
+
+clipboard-paste-protection = true
+clipboard-paste-bracketed-safe = true
+
+# ───────────────────────────────────────────────────────────────────────────
+# SHELL INTEGRATION
+# ───────────────────────────────────────────────────────────────────────────
+
+shell-integration = detect
+
+# ───────────────────────────────────────────────────────────────────────────
+# KEYBINDINGS — SAND SYSTEM
+# ───────────────────────────────────────────────────────────────────────────
+# S - Split:    Create new panels
+# A - Across:   Move between tabs
+# N - Navigate: Jump between split panels
+# D - Destroy:  Close panels and tabs
+
+# S - Split
+keybind = cmd+d=new_split:right
+keybind = cmd+shift+d=new_split:down
+
+# A - Across (tabs)
+keybind = cmd+t=new_tab
+keybind = cmd+shift+left=previous_tab
+keybind = cmd+shift+right=next_tab
+
+# N - Navigate (splits)
+keybind = cmd+alt+left=goto_split:left
+keybind = cmd+alt+right=goto_split:right
+keybind = cmd+alt+up=goto_split:top
+keybind = cmd+alt+down=goto_split:bottom
+keybind = cmd+shift+e=equalize_splits
+keybind = cmd+shift+f=toggle_split_zoom
+
+# D - Destroy
+keybind = cmd+w=close_surface
+
+# ───────────────────────────────────────────────────────────────────────────
+# UTILITY KEYBINDINGS
+# ───────────────────────────────────────────────────────────────────────────
+
+# Font size
+keybind = cmd+plus=increase_font_size:1
+keybind = cmd+minus=decrease_font_size:1
+keybind = cmd+zero=reset_font_size
+
+# Quick terminal global hotkey
+keybind = global:ctrl+grave_accent=toggle_quick_terminal
 
 # Reload config
-bind r source-file ~/.tmux.conf \; display "Config reloaded!"
-
-# Vim-style pane navigation
-bind h select-pane -L
-bind j select-pane -D
-bind k select-pane -U
-bind l select-pane -R
-
-# Pane resizing with prefix + H/J/K/L
-bind -r H resize-pane -L 5
-bind -r J resize-pane -D 5
-bind -r K resize-pane -U 5
-bind -r L resize-pane -R 5
+keybind = cmd+shift+comma=reload_config
 
 # ───────────────────────────────────────────────────────────────────────────
-# WINDOWS & PANES
+# PERFORMANCE
 # ───────────────────────────────────────────────────────────────────────────
 
-# Start at 1 (not 0)
-set -g base-index 1
-setw -g pane-base-index 1
-
-# Renumber on close
-set -g renumber-windows on
-
-# ───────────────────────────────────────────────────────────────────────────
-# TPM PLUGINS
-# ───────────────────────────────────────────────────────────────────────────
-
-set -g @plugin 'tmux-plugins/tpm'
-set -g @plugin 'catppuccin/tmux#v2.1.3'
-
-# ───────────────────────────────────────────────────────────────────────────
-# CATPPUCCIN THEME
-# ───────────────────────────────────────────────────────────────────────────
-
-set -g @catppuccin_flavor 'macchiato'
-set -g @catppuccin_window_status_style 'rounded'
-set -g @catppuccin_status_left_separator "█"
-set -g @catppuccin_status_modules_right "session date_time"
-set -g @catppuccin_status_right_separator "█"
-set -g @catppuccin_date_time_text "%Y-%m-%d %H:%M"
-set -g @catppuccin_window_default_text "#W"
-set -g @catppuccin_window_current_text "#W"
-
-# ───────────────────────────────────────────────────────────────────────────
-# INITIALIZE TPM (must be last)
-# ───────────────────────────────────────────────────────────────────────────
-run '~/.tmux/plugins/tpm/tpm'
+# 25MB scrollback for long Claude Code sessions
+scrollback-limit = 25000000
