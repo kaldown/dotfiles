@@ -20,7 +20,7 @@ adjust-cell-height = 2
 # ───────────────────────────────────────────────────────────────────────────
 
 # Catppuccin Macchiato (dark) / Latte (light) - auto-switches with macOS
-theme = light:Catppuccin Latte,dark:Catppuccin Macchiato
+theme = Catppuccin Macchiato
 
 # Window
 macos-titlebar-style = transparent
@@ -89,18 +89,6 @@ keybind = cmd+shift+f=toggle_split_zoom
 
 # D - Destroy
 keybind = cmd+w=close_surface
-
-# ───────────────────────────────────────────────────────────────────────────
-# FIXTERMS / KKP OVERRIDES
-# ───────────────────────────────────────────────────────────────────────────
-# Force traditional encoding for critical terminal signals regardless of
-# kitty keyboard protocol state. Prevents leaked KKP from breaking shell
-# after programs (e.g., Claude Code) exit without popping the protocol.
-# See: https://github.com/ghostty-org/ghostty/discussions/5071
-
-keybind = ctrl+d=text:\x04
-keybind = ctrl+c=text:\x03
-keybind = ctrl+z=text:\x1a
 
 # ───────────────────────────────────────────────────────────────────────────
 # UTILITY KEYBINDINGS
