@@ -1,16 +1,29 @@
 #!/bin/bash
 # Status line for Claude Code — Powerlevel10k inspired
 # Reads session JSON from stdin, outputs colored multi-line status.
-# Line 1: user@host:dir branch [model] [effort] [ctx] [cost] [duration] [session]
+# Line 1: user@host:dir [model] [effort] [ctx] [cost] [duration] [session]
 # Line 2+: active agents (from hook state files)
 # Line 3+: active tasks  (from hook state files)
+#
+# Artifacts: all temp files live under $STATE_DIR (cleaned on Stop hook).
 
-set -f  # disable globbing
+set -f
 
-# -- Colors ----------------------------------------------------------------
+# -- Colors & helpers ------------------------------------------------------
 CYAN='\033[0;36m'  BLUE='\033[0;34m'  YELLOW='\033[0;33m'
 RED='\033[0;31m'   GREEN='\033[0;32m' MAGENTA='\033[0;35m'
 DIM='\033[2m'      RESET='\033[0m'
+
+badge() { printf '%b[%b%s%b%b]%b' "$DIM" "$1" "$2" "$RESET" "$DIM" "$RESET"; }
+
+fmt_elapsed() {
+    local ts="$1"
+    [ -z "$ts" ] || [ "$ts" -le 0 ] 2>/dev/null && return
+    local s=$(( now - ts ))
+    if [ "$s" -ge 60 ]; then printf ' %b%dm%ds%b' "$DIM" $((s/60)) $((s%60)) "$RESET"
+    else                     printf ' %b%ds%b' "$DIM" "$s" "$RESET"
+    fi
+}
 
 # -- Read JSON from stdin --------------------------------------------------
 INPUT=$(cat)
@@ -29,9 +42,12 @@ eval "$(echo "$INPUT" | jq -r '
 ' 2>/dev/null)" || true
 
 PCT="${PCT%%.*}"
+now=$(date +%s)
+STATE_DIR="${TMPDIR:-/tmp}/claude-sl"
 
-# -- User@host (cached — never changes mid-session) -----------------------
-USERHOST_CACHE="/tmp/statusline-userhost"
+# -- User@host (cached once per machine) -----------------------------------
+USERHOST_CACHE="$STATE_DIR/userhost"
+mkdir -p "$STATE_DIR"
 [ ! -f "$USERHOST_CACHE" ] && printf '%s@%s' "$(whoami)" "$(hostname -s)" > "$USERHOST_CACHE"
 USER_HOST="${CYAN}$(cat "$USERHOST_CACHE")${RESET}"
 
@@ -39,41 +55,7 @@ USER_HOST="${CYAN}$(cat "$USERHOST_CACHE")${RESET}"
 CWD="${CWD:-$PWD}"
 DIR="${BLUE}${CWD/#$HOME/\~}${RESET}"
 
-# -- Git info (cached 5 s) ------------------------------------------------
-GIT_CACHE="/tmp/statusline-git"
-now=$(date +%s)
-cached_at=$(stat -f %m "$GIT_CACHE" 2>/dev/null || echo 0)
-
-if [ $(( now - cached_at )) -gt 5 ]; then
-    if git rev-parse --is-inside-work-tree &>/dev/null; then
-        branch=$(git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --short HEAD 2>/dev/null)
-        if [ -n "$branch" ]; then
-            if git diff --quiet 2>/dev/null && git diff --cached --quiet 2>/dev/null; then
-                echo "clean|$branch" > "$GIT_CACHE"
-            else
-                echo "dirty|$branch" > "$GIT_CACHE"
-            fi
-        else
-            : > "$GIT_CACHE"
-        fi
-    else
-        : > "$GIT_CACHE"
-    fi
-fi
-
-GIT_INFO=""
-GIT_DATA=$(cat "$GIT_CACHE" 2>/dev/null)
-if [ -n "$GIT_DATA" ]; then
-    state="${GIT_DATA%%|*}"
-    branch="${GIT_DATA#*|}"
-    if [ "$state" = "clean" ]; then
-        GIT_INFO=" ${YELLOW}${branch}${RESET}"
-    else
-        GIT_INFO=" ${RED}${branch}*${RESET}"
-    fi
-fi
-
-# -- Effort level (env > project settings > user settings > model default) -
+# -- Effort level (env > project settings > user settings) -----------------
 EFFORT=""
 if [ -n "$CLAUDE_CODE_EFFORT_LEVEL" ]; then
     EFFORT="$CLAUDE_CODE_EFFORT_LEVEL"
@@ -82,69 +64,52 @@ else
         [ -f "$p" ] && val=$(jq -r '.effortLevel // empty' "$p" 2>/dev/null) && [ -n "$val" ] && { EFFORT="$val"; break; }
     done
 fi
-if [ -z "$EFFORT" ]; then
-    case "$MODEL_ID" in
-        *opus-4-6*|*opus-4.6*) EFFORT="medium" ;;
-        *)                      EFFORT="high"   ;;
-    esac
-fi
 
 case "$EFFORT" in
-    low)    EFF="${DIM}[${RED}low${RESET}${DIM}]${RESET}"    ;;
-    medium) EFF="${DIM}[${YELLOW}medium${RESET}${DIM}]${RESET}" ;;
-    high)   EFF="${DIM}[${GREEN}high${RESET}${DIM}]${RESET}"   ;;
-    max)    EFF="${DIM}[${MAGENTA}max${RESET}${DIM}]${RESET}"  ;;
-    *)      EFF="${DIM}[${EFFORT}]${RESET}"                    ;;
+    low)    EFF_COLOR="$RED"     ;;
+    medium) EFF_COLOR="$YELLOW"  ;;
+    high)   EFF_COLOR="$GREEN"   ;;
+    max)    EFF_COLOR="$MAGENTA" ;;
+    *)      EFF_COLOR="$CYAN"    ;;
 esac
 
-MODEL_INFO="${DIM}[${MAGENTA}${MODEL}${RESET}${DIM}]${RESET} ${EFF}"
+MODEL_INFO="$(badge "$MAGENTA" "$MODEL")"
+[ -n "$EFFORT" ] && MODEL_INFO="$MODEL_INFO $(badge "$EFF_COLOR" "$EFFORT")"
 
 # -- Context remaining ----------------------------------------------------
 CTX=""
 if [ "${PCT:-0}" -gt 0 ] 2>/dev/null; then
     remain=$((100 - PCT))
-    if   [ "$remain" -lt 20 ]; then CTX=" ${DIM}[ctx:${RED}${remain}%${RESET}${DIM}]${RESET}"
-    elif [ "$remain" -lt 50 ]; then CTX=" ${DIM}[ctx:${YELLOW}${remain}%${RESET}${DIM}]${RESET}"
-    else                            CTX=" ${DIM}[ctx:${CYAN}${remain}%${RESET}${DIM}]${RESET}"
+    if   [ "$remain" -lt 20 ]; then ctx_color="$RED"
+    elif [ "$remain" -lt 50 ]; then ctx_color="$YELLOW"
+    else                            ctx_color="$CYAN"
     fi
+    CTX=" $(badge "$ctx_color" "ctx:${remain}%")"
 fi
 
 # -- Cost ------------------------------------------------------------------
 COST_FMT=$(printf '%.2f' "${COST:-0}" 2>/dev/null)
 COST_INFO=""
-[ "$COST_FMT" != "0.00" ] && COST_INFO=" ${DIM}[${GREEN}\$${COST_FMT}${RESET}${DIM}]${RESET}"
+[ "$COST_FMT" != "0.00" ] && COST_INFO=" $(badge "$GREEN" "\$${COST_FMT}")"
 
 # -- Duration --------------------------------------------------------------
 DUR=""
 if [ "${DURATION_MS:-0}" -gt 0 ] 2>/dev/null; then
     mins=$((DURATION_MS / 60000))
     secs=$(((DURATION_MS % 60000) / 1000))
-    [ "$mins" -gt 0 ] && DUR=" ${DIM}[${mins}m${secs}s]${RESET}"
+    [ "$mins" -gt 0 ] && DUR=" $(badge "" "${mins}m${secs}s")"
 fi
 
 # -- Output style (non-default only) --------------------------------------
 STYLE=""
 [ -n "$OUTPUT_STYLE" ] && [ "$OUTPUT_STYLE" != "default" ] && \
-    STYLE=" ${DIM}[${CYAN}${OUTPUT_STYLE}${RESET}${DIM}]${RESET}"
+    STYLE=" $(badge "$CYAN" "$OUTPUT_STYLE")"
 
-# -- Session ID (truncated) -----------------------------------------------
-SID="${DIM}[${CYAN}${SESSION_ID:0:8}${RESET}${DIM}]${RESET}"
-
-# -- Helper: format elapsed time ------------------------------------------
-fmt_elapsed() {
-    local ts="$1"
-    [ -z "$ts" ] || [ "$ts" -le 0 ] 2>/dev/null && return
-    local s=$(( now - ts ))
-    if [ "$s" -ge 60 ]; then
-        printf ' %b%dm%ds%b' "$DIM" $((s/60)) $((s%60)) "$RESET"
-    else
-        printf ' %b%ds%b' "$DIM" "$s" "$RESET"
-    fi
-}
+# -- Session ID ------------------------------------------------------------
+SID="$(badge "$CYAN" "${SESSION_ID:0:8}")"
 
 # -- Active agents (from hook state files) ---------------------------------
 AGENT_LINES=""
-STATE_DIR="/tmp/claude-sl"
 AGENTS_FILE="$STATE_DIR/${SESSION_ID}-agents"
 
 if [ -n "$SESSION_ID" ] && [ -f "$AGENTS_FILE" ] && [ -s "$AGENTS_FILE" ]; then
@@ -172,7 +137,7 @@ if [ -n "$SESSION_ID" ] && [ -f "$TASKS_FILE" ] && [ -s "$TASKS_FILE" ]; then
 fi
 
 # -- Output ----------------------------------------------------------------
-echo -e "${USER_HOST}:${DIR}${GIT_INFO} ${MODEL_INFO}${STYLE}${CTX}${COST_INFO}${DUR} ${SID}"
+echo -e "${USER_HOST}:${DIR} ${MODEL_INFO}${STYLE}${CTX}${COST_INFO}${DUR} ${SID}"
 [ -n "$AGENT_LINES" ] && echo -e "$AGENT_LINES"
 [ -n "$TASK_LINES" ]  && echo -e "$TASK_LINES"
 
