@@ -70,6 +70,19 @@ quota_badge() {
     fi
 }
 
+# Render "cache N%" in dim yellow ONLY when hit ratio < 50% and data is present.
+# Silent when healthy — this is a degradation signal, not a vanity metric.
+cache_badge() {
+    local cache_read="$1" cache_create="$2"
+    [ -z "$cache_read" ] && return
+    [ -z "$cache_create" ] && return
+    local total=$(( cache_read + cache_create ))
+    [ "$total" -le 0 ] 2>/dev/null && return
+    local ratio=$(( cache_read * 100 / total ))
+    [ "$ratio" -ge 50 ] 2>/dev/null && return
+    printf '%b%bcache %d%%%b' "$DIM" "$YELLOW" "$ratio" "$RESET"
+}
+
 # Red 200K! badge when the 1M-ctx model has exceeded the 200K tier.
 warn_200k() {
     [ "$1" = "true" ] && printf '%b200K!%b' "$RED" "$RESET"
@@ -121,7 +134,9 @@ eval "$(echo "$INPUT" | jq -r '
   @sh "OUTPUT_STYLE=\(.output_style.name // "default")",
   @sh "Q5_UTIL=\(.rate_limits.five_hour.utilization // "")",
   @sh "Q5_RESET=\(.rate_limits.five_hour.resets_at // "")",
-  @sh "EXCEEDS_200K=\(.exceeds_200k_tokens // false)"
+  @sh "EXCEEDS_200K=\(.exceeds_200k_tokens // false)",
+  @sh "CACHE_READ=\(.context_window.current_usage.cache_read_input_tokens // "")",
+  @sh "CACHE_CREATE=\(.context_window.current_usage.cache_creation_input_tokens // "")"
 ' 2>/dev/null)" || true
 
 PCT="${PCT%%.*}"
@@ -205,7 +220,9 @@ W200=$(warn_200k "$EXCEEDS_200K")
 [ -n "$W200" ] && W200="  $W200"
 Q5=$(quota_badge "$Q5_UTIL" "$Q5_RESET")
 [ -n "$Q5" ] && Q5="  $Q5"
-echo -e "${DIR}${GIT}  ${MODEL_INFO}${STYLE}${CTX}${W200}${Q5}"
+CACHE=$(cache_badge "$CACHE_READ" "$CACHE_CREATE")
+[ -n "$CACHE" ] && CACHE="  $CACHE"
+echo -e "${DIR}${GIT}  ${MODEL_INFO}${STYLE}${CTX}${W200}${Q5}${CACHE}"
 [ -n "$AGENT_LINES" ] && echo -e "$AGENT_LINES"
 [ -n "$TASK_LINES" ]  && echo -e "$TASK_LINES"
 

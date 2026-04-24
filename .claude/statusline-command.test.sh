@@ -135,6 +135,27 @@ NOT_OVER_JSON='{"session_id":"s","cwd":"/tmp","model":{"id":"x","display_name":"
 OUT=$(run_with "$NOT_OVER_JSON")
 assert_missing "$OUT" "200K!" "no warning when flag false"
 
+# -----------------------------------------------------------------------------
+# Fixture 7: degraded cache-hit (10%) → badge renders.
+# Ratio = read / (read + creation); 100 / (100 + 900) = 10%.
+# -----------------------------------------------------------------------------
+CURRENT_LABEL="cache_degraded"
+CACHE_BAD='{"session_id":"s","cwd":"/tmp","model":{"id":"x","display_name":"Opus"},"context_window":{"used_percentage":10,"current_usage":{"cache_read_input_tokens":100,"cache_creation_input_tokens":900}}}'
+OUT=$(run_with "$CACHE_BAD")
+assert_contains "$OUT" "cache 10%" "degraded cache ratio renders"
+
+# Fixture 8: healthy cache-hit (90%) → badge silent.
+CURRENT_LABEL="cache_healthy"
+CACHE_OK='{"session_id":"s","cwd":"/tmp","model":{"id":"x","display_name":"Opus"},"context_window":{"used_percentage":10,"current_usage":{"cache_read_input_tokens":900,"cache_creation_input_tokens":100}}}'
+OUT=$(run_with "$CACHE_OK")
+assert_missing "$OUT" "cache" "healthy cache-hit → badge silent"
+
+# Fixture 9: current_usage absent → badge silent.
+CURRENT_LABEL="cache_absent"
+CACHE_NONE='{"session_id":"s","cwd":"/tmp","model":{"id":"x","display_name":"Opus"},"context_window":{"used_percentage":10}}'
+OUT=$(run_with "$CACHE_NONE")
+assert_missing "$OUT" "cache" "no cache data → badge silent"
+
 printf '\n%d passed, %d failed\n' "$PASS" "$FAIL"
 [ "$FAIL" -gt 0 ] && exit 1
 exit 0
