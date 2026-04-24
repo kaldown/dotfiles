@@ -105,6 +105,23 @@ assert_contains "$OUT" "main"   "clean branch rendered"
 assert_missing  "$OUT" "±"      "no dirty marker on clean repo"
 rm -rf "$GIT_TMP"
 
+# -----------------------------------------------------------------------------
+# Fixture 4: rate_limits.five_hour present.
+# resets_at is a fixed epoch so we assert the format, not the exact clock value.
+# -----------------------------------------------------------------------------
+CURRENT_LABEL="quota_5h"
+QUOTA_JSON='{"session_id":"s","cwd":"/tmp","model":{"id":"x","display_name":"Opus"},"context_window":{"used_percentage":10},"rate_limits":{"five_hour":{"utilization":42,"resets_at":1745505000}}}'
+OUT=$(run_with "$QUOTA_JSON")
+assert_contains "$OUT" "5h 42%" "5h quota label + pct"
+assert_contains "$OUT" "↻"      "reset arrow rendered"
+
+# Fixture 5: rate_limits absent → badge silent.
+CURRENT_LABEL="quota_absent"
+NO_QUOTA_JSON='{"session_id":"s","cwd":"/tmp","model":{"id":"x","display_name":"Opus"},"context_window":{"used_percentage":10}}'
+OUT=$(run_with "$NO_QUOTA_JSON")
+assert_missing "$OUT" "5h"  "no quota badge when field absent"
+assert_missing "$OUT" "↻"   "no reset arrow when field absent"
+
 printf '\n%d passed, %d failed\n' "$PASS" "$FAIL"
 [ "$FAIL" -gt 0 ] && exit 1
 exit 0

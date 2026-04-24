@@ -47,6 +47,29 @@ ctx_bar() {
     printf '%bctx %s %d%%%b' "$color" "$bar" "$pct" "$RESET"
 }
 
+# Render 5h rate-limit badge or empty when data absent.
+# Format: "5h N% ↻HH:MM" (reset time is local).
+quota_badge() {
+    local util="$1" resets="$2"
+    [ -z "$util" ] && return
+    [ "$util" -le 0 ] 2>/dev/null && return
+    local color
+    if   [ "$util" -ge 90 ]; then color="$RED"
+    elif [ "$util" -ge 70 ]; then color="$YELLOW"
+    else                          color="$GREEN"
+    fi
+    local reset_time=""
+    if [ -n "$resets" ] && [ "$resets" -gt 0 ] 2>/dev/null; then
+        # BSD date (macOS) uses `-r EPOCH`; GNU date uses `-d @EPOCH`.
+        reset_time=$(date -r "$resets" '+%H:%M' 2>/dev/null || date -d "@$resets" '+%H:%M' 2>/dev/null)
+    fi
+    if [ -n "$reset_time" ]; then
+        printf '%b5h %d%% ↻%s%b' "$color" "$util" "$reset_time" "$RESET"
+    else
+        printf '%b5h %d%%%b' "$color" "$util" "$RESET"
+    fi
+}
+
 # Return "branch±N" (dirty) or "branch" (clean) for the given cwd, or empty
 # if the cwd isn't inside a git repo. Result is cached 3s per-cwd.
 git_info() {
@@ -90,10 +113,13 @@ eval "$(echo "$INPUT" | jq -r '
   @sh "SESSION_ID=\(.session_id // "")",
   @sh "CWD=\(.cwd // "")",
   @sh "PCT=\(.context_window.used_percentage // 0)",
-  @sh "OUTPUT_STYLE=\(.output_style.name // "default")"
+  @sh "OUTPUT_STYLE=\(.output_style.name // "default")",
+  @sh "Q5_UTIL=\(.rate_limits.five_hour.utilization // "")",
+  @sh "Q5_RESET=\(.rate_limits.five_hour.resets_at // "")"
 ' 2>/dev/null)" || true
 
 PCT="${PCT%%.*}"
+Q5_UTIL="${Q5_UTIL%%.*}"
 now=$(date +%s)
 STATE_DIR="${TMPDIR:-/tmp}/claude-sl"
 
@@ -169,7 +195,9 @@ fi
 # -- Output ----------------------------------------------------------------
 GIT=$(git_info "$CWD")
 [ -n "$GIT" ] && GIT="  $GIT"
-echo -e "${DIR}${GIT}  ${MODEL_INFO}${STYLE}${CTX}"
+Q5=$(quota_badge "$Q5_UTIL" "$Q5_RESET")
+[ -n "$Q5" ] && Q5="  $Q5"
+echo -e "${DIR}${GIT}  ${MODEL_INFO}${STYLE}${CTX}${Q5}"
 [ -n "$AGENT_LINES" ] && echo -e "$AGENT_LINES"
 [ -n "$TASK_LINES" ]  && echo -e "$TASK_LINES"
 
