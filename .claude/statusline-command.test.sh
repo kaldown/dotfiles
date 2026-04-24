@@ -47,6 +47,21 @@ run_with() {
 # Fixtures added by later tasks.
 # -----------------------------------------------------------------------------
 
+# -----------------------------------------------------------------------------
+# Fixture 1: baseline payload (no rate_limits, no current_usage, no 1M flag)
+# Asserts that Task 2's deletions actually removed the old segments.
+# -----------------------------------------------------------------------------
+CURRENT_LABEL="baseline"
+BASELINE_JSON='{"session_id":"abc12345-6789-0000-0000-000000000000","cwd":"/tmp","model":{"id":"claude-opus-4-7","display_name":"Opus"},"context_window":{"used_percentage":22},"cost":{"total_cost_usd":0.42,"total_duration_ms":120000},"output_style":{"name":"default"}}'
+OUT=$(run_with "$BASELINE_JSON")
+assert_contains "$OUT" "Opus"       "model visible"
+assert_contains "$OUT" "ctx"        "ctx label visible (exact format asserted in Task 3)"
+assert_missing  "$OUT" "0.42"       "cost removed"
+assert_missing  "$OUT" "\$0"        "no dollar-cost token"
+assert_missing  "$OUT" "2m0s"       "duration removed"
+assert_missing  "$OUT" "abc12345"   "session-id removed"
+assert_missing  "$OUT" "@"          "user@host removed"
+
 printf '\n%d passed, %d failed\n' "$PASS" "$FAIL"
 [ "$FAIL" -gt 0 ] && exit 1
 exit 0
