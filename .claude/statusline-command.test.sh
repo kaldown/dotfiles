@@ -122,6 +122,19 @@ OUT=$(run_with "$NO_QUOTA_JSON")
 assert_missing "$OUT" "5h"  "no quota badge when field absent"
 assert_missing "$OUT" "↻"   "no reset arrow when field absent"
 
+# -----------------------------------------------------------------------------
+# Fixture 6: exceeds_200k_tokens=true on 1M-ctx model.
+# -----------------------------------------------------------------------------
+CURRENT_LABEL="exceeds_200k_true"
+OVER_JSON='{"session_id":"s","cwd":"/tmp","model":{"id":"x","display_name":"Opus"},"context_window":{"used_percentage":30},"exceeds_200k_tokens":true}'
+OUT=$(run_with "$OVER_JSON")
+assert_contains "$OUT" "200K!" "200K warning renders when flag true"
+
+CURRENT_LABEL="exceeds_200k_false"
+NOT_OVER_JSON='{"session_id":"s","cwd":"/tmp","model":{"id":"x","display_name":"Opus"},"context_window":{"used_percentage":30},"exceeds_200k_tokens":false}'
+OUT=$(run_with "$NOT_OVER_JSON")
+assert_missing "$OUT" "200K!" "no warning when flag false"
+
 printf '\n%d passed, %d failed\n' "$PASS" "$FAIL"
 [ "$FAIL" -gt 0 ] && exit 1
 exit 0

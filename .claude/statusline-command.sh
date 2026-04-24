@@ -70,6 +70,11 @@ quota_badge() {
     fi
 }
 
+# Red 200K! badge when the 1M-ctx model has exceeded the 200K tier.
+warn_200k() {
+    [ "$1" = "true" ] && printf '%b200K!%b' "$RED" "$RESET"
+}
+
 # Return "branch±N" (dirty) or "branch" (clean) for the given cwd, or empty
 # if the cwd isn't inside a git repo. Result is cached 3s per-cwd.
 git_info() {
@@ -115,7 +120,8 @@ eval "$(echo "$INPUT" | jq -r '
   @sh "PCT=\(.context_window.used_percentage // 0)",
   @sh "OUTPUT_STYLE=\(.output_style.name // "default")",
   @sh "Q5_UTIL=\(.rate_limits.five_hour.utilization // "")",
-  @sh "Q5_RESET=\(.rate_limits.five_hour.resets_at // "")"
+  @sh "Q5_RESET=\(.rate_limits.five_hour.resets_at // "")",
+  @sh "EXCEEDS_200K=\(.exceeds_200k_tokens // false)"
 ' 2>/dev/null)" || true
 
 PCT="${PCT%%.*}"
@@ -195,9 +201,11 @@ fi
 # -- Output ----------------------------------------------------------------
 GIT=$(git_info "$CWD")
 [ -n "$GIT" ] && GIT="  $GIT"
+W200=$(warn_200k "$EXCEEDS_200K")
+[ -n "$W200" ] && W200="  $W200"
 Q5=$(quota_badge "$Q5_UTIL" "$Q5_RESET")
 [ -n "$Q5" ] && Q5="  $Q5"
-echo -e "${DIR}${GIT}  ${MODEL_INFO}${STYLE}${CTX}${Q5}"
+echo -e "${DIR}${GIT}  ${MODEL_INFO}${STYLE}${CTX}${W200}${Q5}"
 [ -n "$AGENT_LINES" ] && echo -e "$AGENT_LINES"
 [ -n "$TASK_LINES" ]  && echo -e "$TASK_LINES"
 
