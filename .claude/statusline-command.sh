@@ -1,9 +1,9 @@
 #!/bin/bash
 # Status line for Claude Code — Powerlevel10k inspired
 # Reads session JSON from stdin, outputs colored multi-line status.
-# Line 1: user@host:dir [model] [effort] [ctx] [cost] [duration] [session]
-# Line 2+: active agents (from hook state files)
-# Line 3+: active tasks  (from hook state files)
+# Line 1: dir [branch±N] [model] [effort] [output-style] [ctx bar] [200K!] [5h quota] [cache%]
+# Line 2+: active subagents (from hook state files)
+# Line 3+: active tasks     (from hook state files)
 #
 # Artifacts: all temp files live under $STATE_DIR (cleaned on Stop hook).
 
@@ -127,7 +127,6 @@ INPUT=$(cat)
 # -- Parse all fields in a single jq call ----------------------------------
 eval "$(echo "$INPUT" | jq -r '
   @sh "MODEL=\(.model.display_name // "Claude")",
-  @sh "MODEL_ID=\(.model.id // "")",
   @sh "SESSION_ID=\(.session_id // "")",
   @sh "CWD=\(.cwd // "")",
   @sh "PCT=\(.context_window.used_percentage // 0)",
