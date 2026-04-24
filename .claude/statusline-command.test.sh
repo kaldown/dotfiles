@@ -61,6 +61,15 @@ assert_missing  "$OUT" "\$0"        "no dollar-cost token"
 assert_missing  "$OUT" "2m0s"       "duration removed"
 assert_missing  "$OUT" "abc12345"   "session-id removed"
 assert_missing  "$OUT" "@"          "user@host removed"
+assert_contains "$OUT" "ctx"        "ctx label present"
+assert_contains "$OUT" "░"          "ctx bar empty cell present"
+assert_contains "$OUT" "22%"        "ctx pct present"
+
+CURRENT_LABEL="ctx_bar_66"
+CTX66_JSON='{"session_id":"s","cwd":"/tmp","model":{"id":"claude-opus-4-7","display_name":"Opus"},"context_window":{"used_percentage":66}}'
+OUT=$(run_with "$CTX66_JSON")
+assert_contains "$OUT" "▓▓▓▓▓▓░░░░" "66% → 6 filled, 4 empty"
+assert_contains "$OUT" "66%"         "66% label present"
 
 printf '\n%d passed, %d failed\n' "$PASS" "$FAIL"
 [ "$FAIL" -gt 0 ] && exit 1

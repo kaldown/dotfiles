@@ -25,6 +25,28 @@ fmt_elapsed() {
     fi
 }
 
+# Render a 10-cell progress bar for context used %.
+# Color is keyed on REMAINING %: <20 red, 20-49 yellow, ≥50 cyan.
+ctx_bar() {
+    local pct="$1"
+    [ -z "$pct" ] || [ "$pct" -le 0 ] 2>/dev/null && return
+    [ "$pct" -gt 100 ] 2>/dev/null && pct=100
+    local filled=$(( pct / 10 ))
+    local empty=$(( 10 - filled ))
+    local bar=""
+    local i=0
+    while [ "$i" -lt "$filled" ]; do bar="${bar}▓"; i=$((i+1)); done
+    i=0
+    while [ "$i" -lt "$empty" ];  do bar="${bar}░"; i=$((i+1)); done
+    local remain=$(( 100 - pct ))
+    local color
+    if   [ "$remain" -lt 20 ]; then color="$RED"
+    elif [ "$remain" -lt 50 ]; then color="$YELLOW"
+    else                            color="$CYAN"
+    fi
+    printf '%bctx %s %d%%%b' "$color" "$bar" "$pct" "$RESET"
+}
+
 # -- Read JSON from stdin --------------------------------------------------
 INPUT=$(cat)
 [ -z "$INPUT" ] && { echo "Claude"; exit 0; }
@@ -70,15 +92,10 @@ esac
 MODEL_INFO="$(badge "$MAGENTA" "$MODEL")"
 [ -n "$EFFORT" ] && MODEL_INFO="$MODEL_INFO $(badge "$EFF_COLOR" "$EFFORT")"
 
-# -- Context remaining ----------------------------------------------------
+# -- Context progress bar --------------------------------------------------
 CTX=""
 if [ "${PCT:-0}" -gt 0 ] 2>/dev/null; then
-    remain=$((100 - PCT))
-    if   [ "$remain" -lt 20 ]; then ctx_color="$RED"
-    elif [ "$remain" -lt 50 ]; then ctx_color="$YELLOW"
-    else                            ctx_color="$CYAN"
-    fi
-    CTX=" $(badge "$ctx_color" "ctx:${remain}%")"
+    CTX="  $(ctx_bar "$PCT")"
 fi
 
 
