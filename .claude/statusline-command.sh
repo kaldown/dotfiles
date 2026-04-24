@@ -47,6 +47,38 @@ ctx_bar() {
     printf '%bctx %s %d%%%b' "$color" "$bar" "$pct" "$RESET"
 }
 
+# Return "branch±N" (dirty) or "branch" (clean) for the given cwd, or empty
+# if the cwd isn't inside a git repo. Result is cached 3s per-cwd.
+git_info() {
+    local cwd="$1"
+    [ -z "$cwd" ] && return
+    # md5 on macOS (BSD: md5 -qs), fall back to md5sum on Linux.
+    local hash
+    hash=$(md5 -qs "$cwd" 2>/dev/null || printf '%s' "$cwd" | md5sum 2>/dev/null | cut -d' ' -f1)
+    local cache="$STATE_DIR/git-$hash"
+    local now_s; now_s=$(date +%s)
+    if [ -f "$cache" ]; then
+        local mtime
+        mtime=$(stat -f%m "$cache" 2>/dev/null || stat -c%Y "$cache" 2>/dev/null || echo 0)
+        if [ $(( now_s - mtime )) -lt 3 ]; then cat "$cache"; return; fi
+    fi
+    local branch
+    branch=$(git -C "$cwd" symbolic-ref --short HEAD 2>/dev/null) || {
+        : > "$cache"
+        return
+    }
+    local dirty
+    dirty=$(git -C "$cwd" status --porcelain 2>/dev/null | wc -l | tr -d ' ')
+    local out
+    if [ "${dirty:-0}" -gt 0 ] 2>/dev/null; then
+        out=$(printf '%b%s±%s%b' "$YELLOW" "$branch" "$dirty" "$RESET")
+    else
+        out=$(printf '%b%s%b' "$DIM" "$branch" "$RESET")
+    fi
+    printf '%s' "$out" > "$cache"
+    printf '%s' "$out"
+}
+
 # -- Read JSON from stdin --------------------------------------------------
 INPUT=$(cat)
 [ -z "$INPUT" ] && { echo "Claude"; exit 0; }
@@ -135,7 +167,9 @@ if [ -n "$SESSION_ID" ] && [ -f "$TASKS_FILE" ] && [ -s "$TASKS_FILE" ]; then
 fi
 
 # -- Output ----------------------------------------------------------------
-echo -e "${DIR}  ${MODEL_INFO}${STYLE}${CTX}"
+GIT=$(git_info "$CWD")
+[ -n "$GIT" ] && GIT="  $GIT"
+echo -e "${DIR}${GIT}  ${MODEL_INFO}${STYLE}${CTX}"
 [ -n "$AGENT_LINES" ] && echo -e "$AGENT_LINES"
 [ -n "$TASK_LINES" ]  && echo -e "$TASK_LINES"
 

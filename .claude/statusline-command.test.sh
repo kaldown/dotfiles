@@ -71,6 +71,40 @@ OUT=$(run_with "$CTX66_JSON")
 assert_contains "$OUT" "▓▓▓▓▓▓░░░░" "66% → 6 filled, 4 empty"
 assert_contains "$OUT" "66%"         "66% label present"
 
+# -----------------------------------------------------------------------------
+# Fixture 3: git dirty state — build a tmp repo, stage nothing, modify one file.
+# -----------------------------------------------------------------------------
+CURRENT_LABEL="git_dirty"
+GIT_TMP=$(mktemp -d)
+(
+    cd "$GIT_TMP"
+    git init -q -b main
+    git config user.email "t@t"
+    git config user.name  "t"
+    echo a > a.txt && git add a.txt && git commit -q -m init
+    echo b > b.txt  # uncommitted new file -> dirty count 1
+) >/dev/null 2>&1
+GIT_JSON=$(printf '{"session_id":"s","cwd":"%s","model":{"id":"x","display_name":"Opus"},"context_window":{"used_percentage":10}}' "$GIT_TMP")
+OUT=$(run_with "$GIT_JSON")
+assert_contains "$OUT" "main±1" "dirty branch rendered with count"
+rm -rf "$GIT_TMP"
+
+# Clean-repo variant: commit the file, dirty count drops to 0.
+CURRENT_LABEL="git_clean"
+GIT_TMP=$(mktemp -d)
+(
+    cd "$GIT_TMP"
+    git init -q -b main
+    git config user.email "t@t"
+    git config user.name  "t"
+    echo a > a.txt && git add a.txt && git commit -q -m init
+) >/dev/null 2>&1
+GIT_JSON=$(printf '{"session_id":"s","cwd":"%s","model":{"id":"x","display_name":"Opus"},"context_window":{"used_percentage":10}}' "$GIT_TMP")
+OUT=$(run_with "$GIT_JSON")
+assert_contains "$OUT" "main"   "clean branch rendered"
+assert_missing  "$OUT" "±"      "no dirty marker on clean repo"
+rm -rf "$GIT_TMP"
+
 printf '\n%d passed, %d failed\n' "$PASS" "$FAIL"
 [ "$FAIL" -gt 0 ] && exit 1
 exit 0
