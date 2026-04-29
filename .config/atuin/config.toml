@@ -102,7 +102,7 @@ show_preview = true
 
 ## Show numeric shortcuts (1..9) beside list items in the TUI
 ## set to false to hide the moving numbers if you find them distracting
-show_numeric_shortcuts = false
+show_numeric_shortcuts = true
 
 ## default history list format - can also be specified with the --format arg
 # history_format = "{time}\t{command}\t{duration}"
@@ -129,7 +129,7 @@ show_numeric_shortcuts = false
 ## Configure the maximum height of the preview to show.
 ## Useful when you have long scripts in your history that you want to distinguish
 ## by more than the first few lines.
-max_preview_height = 4
+max_preview_height = 20
 
 ## Configure whether or not to show the help row, which includes the current Atuin
 ## version (and whether an update is available), a keymap hint, and the total
@@ -283,11 +283,12 @@ records = true
 # debug = true
 
 # Style and UI
-style = "compact"
+style = "full"
 inline_height = 30
 show_preview = true
 enter_accept = true
 store_failed = false
+keymap_mode = "vim-normal"
 
 # Format for `atuin history` CLI command (does NOT affect TUI search)
 history_format = "{command}"

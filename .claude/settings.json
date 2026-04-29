@@ -1,7 +1,9 @@
 {
   "env": {
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
-    "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "95"
+    "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "95",
+    "CLAUDE_CODE_NO_FLICKER": "1",
+    "CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING": "1"
   },
   "attribution": {
     "commit": "",
@@ -49,6 +51,63 @@
     ],
     "respectGitignore": true
   },
+  "hooks": {
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/statusline-hooks.sh agent-start",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/statusline-hooks.sh agent-stop",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "TaskCreated": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/statusline-hooks.sh task-create",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "TaskCompleted": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/statusline-hooks.sh task-complete",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/statusline-hooks.sh cleanup",
+            "async": true
+          }
+        ]
+      }
+    ]
+  },
   "statusLine": {
     "type": "command",
     "command": "bash ~/.claude/statusline-command.sh"
@@ -68,10 +127,9 @@
     "rust-analyzer-lsp@claude-plugins-official": false,
     "c4-architecture@claude-code-workflows": false,
     "cloud-infrastructure@claude-code-workflows": false,
-    "frontend-design@claude-plugins-official": false,
+    "frontend-design@claude-plugins-official": true,
     "hookify@claude-plugins-official": false,
     "code-simplifier@claude-plugins-official": true,
-    "exa-mcp-server@exa-mcp-server": true,
     "codebase-cleanup@claude-code-workflows": false,
     "developer-essentials@claude-code-workflows": true,
     "error-debugging@claude-code-workflows": true,
@@ -89,12 +147,12 @@
     "github@claude-plugins-official": false,
     "playwright@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": false,
-    "security-guidance@claude-plugins-official": true,
+    "security-guidance@claude-plugins-official": false,
     "commit-commands@claude-plugins-official": true,
     "serena@claude-plugins-official": false,
     "pr-review-toolkit@claude-plugins-official": true,
     "plugin-dev@claude-plugins-official": false,
-    "slack@claude-plugins-official": true,
+    "slack@claude-plugins-official": false,
     "playground@claude-plugins-official": false,
     "chrome-devtools-mcp@claude-plugins-official": false,
     "deploy-on-aws@claude-plugins-official": false,
@@ -102,7 +160,21 @@
     "microsoft-docs@claude-plugins-official": false,
     "mintlify@claude-plugins-official": false,
     "atomic-agents@claude-plugins-official": false,
-    "telegram@claude-plugins-official": true
+    "telegram@claude-plugins-official": false,
+    "revdiff@revdiff": true,
+    "remember@claude-plugins-official": true,
+    "circleback@claude-plugins-official": false,
+    "sourcegraph@claude-plugins-official": false,
+    "goodmem@claude-plugins-official": false,
+    "optibot@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "revdiff": {
+      "source": {
+        "source": "github",
+        "repo": "umputun/revdiff"
+      }
+    }
   },
   "sandbox": {
     "enabled": true,
@@ -138,48 +210,12 @@
       "/usr"
     ]
   },
-  "hooks": {
-    "SubagentStart": [{
-      "hooks": [{
-        "type": "command",
-        "command": "bash ~/.claude/statusline-hooks.sh agent-start",
-        "async": true
-      }]
-    }],
-    "SubagentStop": [{
-      "hooks": [{
-        "type": "command",
-        "command": "bash ~/.claude/statusline-hooks.sh agent-stop",
-        "async": true
-      }]
-    }],
-    "TaskCreated": [{
-      "hooks": [{
-        "type": "command",
-        "command": "bash ~/.claude/statusline-hooks.sh task-create",
-        "async": true
-      }]
-    }],
-    "TaskCompleted": [{
-      "hooks": [{
-        "type": "command",
-        "command": "bash ~/.claude/statusline-hooks.sh task-complete",
-        "async": true
-      }]
-    }],
-    "Stop": [{
-      "hooks": [{
-        "type": "command",
-        "command": "bash ~/.claude/statusline-hooks.sh cleanup",
-        "async": true
-      }]
-    }]
-  },
   "alwaysThinkingEnabled": true,
-  "effortLevel": "high",
+  "effortLevel": "xhigh",
   "plansDirectory": ".claude/plans",
-  "additionalDirectories": [
-    "/Users/kaldown/Projects/WoW"
-  ],
-  "teammateMode": "tmux"
+  "verbose": true,
+  "autoCompactEnabled": false,
+  "teammateMode": "tmux",
+  "remoteControlAtStartup": false,
+  "agentPushNotifEnabled": true
 }

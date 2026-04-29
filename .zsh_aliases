@@ -230,6 +230,13 @@ ports() { lsof -i -P -n | grep LISTEN }
 # Kill process on port
 killport() { lsof -ti :"$1" | xargs kill -9 }
 
+# Delete the previously checked-out git branch (with confirmation)
+gitremoveprev() {
+  local prev=$(git rev-parse --abbrev-ref @{-1} 2>/dev/null)
+  [[ -z "$prev" ]] && { echo "No previous branch found."; return 1; }
+  read "confirm?Delete branch '$prev'? [y/N] " && [[ $confirm == [yY] ]] && git branch -D "$prev"
+}
+
 # ------------------------------------------------------------------------------
 # ORIGINAL COMMAND ACCESS (for reference)
 # ------------------------------------------------------------------------------

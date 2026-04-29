@@ -1,6 +1,6 @@
 [user]
     email = kaldownb@gmail.com
-    name = kAldown
+    name = Bogdan Osinnyi (kAldown)
 
 [core]
     editor = nvim
@@ -123,7 +123,7 @@
     ri = "!f() { git rebase -i HEAD~${1:-10}; }; f"
     
     # Show what I did today
-    today = log --since='midnight' --author='kAldown' --oneline
+    today = log --since='midnight' --author='Bogdan Osinnyi (kAldown)' --oneline
     
     # Show branches merged into current
     merged = branch --merged
