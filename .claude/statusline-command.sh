@@ -135,7 +135,8 @@ eval "$(echo "$INPUT" | jq -r '
   @sh "Q5_RESET=\(.rate_limits.five_hour.resets_at // "")",
   @sh "EXCEEDS_200K=\(.exceeds_200k_tokens // false)",
   @sh "CACHE_READ=\(.context_window.current_usage.cache_read_input_tokens // "")",
-  @sh "CACHE_CREATE=\(.context_window.current_usage.cache_creation_input_tokens // "")"
+  @sh "CACHE_CREATE=\(.context_window.current_usage.cache_creation_input_tokens // "")",
+  @sh "EFFORT_JSON=\(.effort.level // "")"
 ' 2>/dev/null)" || true
 
 PCT="${PCT%%.*}"
@@ -149,9 +150,13 @@ mkdir -p "$STATE_DIR"
 CWD="${CWD:-$PWD}"
 DIR="${BLUE}${CWD/#$HOME/\~}${RESET}"
 
-# -- Effort level (env > project settings > user settings) -----------------
+# -- Effort level (live session JSON > env > project settings > user settings)
+# `.effort.level` from stdin reflects the live session value (incl. /effort
+# changes that aren't persisted to settings.json, e.g. "max").
 EFFORT=""
-if [ -n "$CLAUDE_CODE_EFFORT_LEVEL" ]; then
+if [ -n "$EFFORT_JSON" ]; then
+    EFFORT="$EFFORT_JSON"
+elif [ -n "$CLAUDE_CODE_EFFORT_LEVEL" ]; then
     EFFORT="$CLAUDE_CODE_EFFORT_LEVEL"
 else
     for p in "$CWD/.claude/settings.json" "$HOME/.claude/settings.json"; do
