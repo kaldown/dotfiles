@@ -52,12 +52,23 @@
     "respectGitignore": true
   },
   "hooks": {
+    "PreToolUse": [
+      {
+        "hooks":
+        [
+          {
+            "type":"command",
+            "command":"bash ~/.claude/hooks/timeout-guard.sh"
+          }
+        ]
+      }
+    ],
     "SubagentStart": [
       {
         "hooks": [
           {
             "type": "command",
-            "command": "bash ~/.claude/statusline-hooks.sh agent-start",
+            "command": "bash ~/.claude/hooks/statusline-hooks.sh agent-start",
             "async": true
           }
         ]
@@ -68,7 +79,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ~/.claude/statusline-hooks.sh agent-stop",
+            "command": "bash ~/.claude/hooks/statusline-hooks.sh agent-stop",
             "async": true
           }
         ]
@@ -79,7 +90,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ~/.claude/statusline-hooks.sh task-create",
+            "command": "bash ~/.claude/hooks/statusline-hooks.sh task-create",
             "async": true
           }
         ]
@@ -90,7 +101,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ~/.claude/statusline-hooks.sh task-complete",
+            "command": "bash ~/.claude/hooks/statusline-hooks.sh task-complete",
             "async": true
           }
         ]
@@ -101,7 +112,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ~/.claude/statusline-hooks.sh cleanup",
+            "command": "bash ~/.claude/hooks/statusline-hooks.sh cleanup",
             "async": true
           }
         ]
@@ -110,7 +121,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "bash ~/.claude/statusline-command.sh"
+    "command": "bash ~/.claude/hooks/statusline-command.sh"
   },
   "enabledPlugins": {
     "context7@claude-plugins-official": true,
