@@ -52,17 +52,6 @@
     "respectGitignore": true
   },
   "hooks": {
-    "PreToolUse": [
-      {
-        "hooks":
-        [
-          {
-            "type":"command",
-            "command":"bash ~/.claude/hooks/timeout-guard.sh"
-          }
-        ]
-      }
-    ],
     "SubagentStart": [
       {
         "hooks": [
