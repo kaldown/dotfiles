@@ -67,6 +67,7 @@ User-level conventions that apply across all the user's projects, independent of
 | **Error monitoring: Sentry** | Project ships to production with real users (any web service, worker, or scheduled job). | `rules/observability.md` describing init contract + env-var conventions; an `app/observability.py` (or stack-equivalent) wrapper module so call sites never import the SDK directly; a `.sentryclirc` at repo root pinning org/project; a project-local debug skill that defers CLI mechanics to the auto-installed `sentry-cli` agent skill. Use the `sentry-sdk-setup` skill (from `sentry@claude-plugins-official`) to wire the SDK for the project's stack. |
 | **Pre-commit local validation** | Project has any CI gating (lint, typecheck, tests, migration check) and pushes to `main` deploy to production. | `rules/pre-commit-checks.md` declaring a single aggregator command (`make check`, `pnpm check`, `cargo check`, etc.) that mirrors CI checks in CI order and must be green before every commit. Project must expose the aggregator alongside individual targets. |
 | **Testing scope: own logic, not libraries** | Project has any test suite. | `rules/testing-scope.md` (or `rules/testing.md` if the project already uses that filename) declaring what is in scope (pure logic, domain invariants, anything where a regression in our code silently changes observable behavior) and what is out of scope (settings parsing, third-party integrations, HTTP probes against external services, UI rendering, configuration boilerplate). |
+| **Subagent model floor: never haiku** | Project uses Claude Code subagent dispatch (Agent / Task tool) — including in implementation plans authored by `writing-plans`. | `rules/subagent-models.md` declaring sonnet as the floor for mechanical/implementation dispatches and opus for design/review dispatches; haiku forbidden regardless of task simplicity. CLAUDE.md operating principles cite the rule explicitly so it surfaces during plan creation. |
 
 ### Rationale (so future scaffolds can judge overrides)
 
@@ -89,6 +90,10 @@ User-level conventions that apply across all the user's projects, independent of
 **Testing scope chosen because:** every test costs maintenance forever; a test against a third-party library passes today, fails when that library upgrades for a legitimate reason, and never once catches a bug we introduced. Tests earn their keep when a green `make check` means "the application still does what we promised" — tests that mirror framework guarantees (pydantic-settings parsing, ORM dialect details, SDK request shapes) dilute that signal. The rule is binding because without it, the test suite drifts toward "passes everything, catches nothing" — a state that is worse than no test suite at all because it inspires false confidence at PR-review time. Domain invariants (e.g., "every archetype declares a `pdf_filename`") belong in their owner's tests (loader/validator/migration) rather than spread across integration tests, so there is one place to fix when the invariant changes.
 
 **Override the testing-scope default if:** the project is a thin wrapper around a third-party library where the integration *is* the product (in which case the integration shape is owned logic, not framework guarantee), or the project's compliance/audit posture mandates exhaustive integration coverage (regulated industries). Neither case is the user's typical project shape.
+
+**Subagent model floor chosen because:** the user has repeatedly observed that haiku-class models produce code that *looks* correct but fails subtly — silent fallbacks, missed validation rules, partial implementations claimed as complete — even when given a clear plan. Re-dispatching the same task on sonnet returns correct work in one shot. Total time-to-correct-output is lower starting from sonnet than from haiku-then-sonnet; the apparent compute saving from haiku is a false economy. The `writing-plans` skill's per-task model-selection table (mechanical → cheap, integration → standard, design → capable) still applies for picking *between* sonnet and opus — the floor moves up, the gradient stays.
+
+**Override the subagent-model-floor default if:** never, in practice. This is a hard floor, not a default. If a future model release introduces a tier between haiku and sonnet that proves reliable, this rule gets revised explicitly — not silently bypassed.
 
 ### What to scaffold in the new project's `rules/deployment.md`
 
@@ -247,6 +252,47 @@ If a setting is misconfigured in production, error monitoring (e.g., Sentry) wil
 ```
 
 Filename note: prefer `testing-scope.md` for new projects (the topic is *scope*, not all-of-testing). Existing projects with `testing.md` should keep the existing filename to avoid churn.
+
+### What to scaffold for subagent-model-floor
+
+Two artifacts: a `rules/subagent-models.md` file and an explicit citation in `CLAUDE.md` operating principles. The rule must be surfaced in CLAUDE.md (not only in `rules/`) because plan creation reads operating principles, and the rule needs to be in context every time a plan assigns models per task.
+
+**1. `rules/subagent-models.md`:**
+
+```markdown
+# Subagent model floor
+
+When dispatching subagents (Agent / Task tool with a `model:` parameter), pick from a deliberate floor — never the cheapest model.
+
+## The rule
+
+- **Never haiku.** Haiku-class models produce subtly wrong code, miss the spec, or stall on judgment calls. The cost of bad work is far higher than the cost of compute.
+- **Sonnet is the floor** for mechanical implementation tasks (well-specified, 1–2 files, clear acceptance criteria).
+- **Opus for design and review.** Spec compliance review, code quality review, architectural decisions, and any task with judgment calls go to the most capable model available.
+
+## Why
+
+Repeated experience: dispatches on haiku produced code that *looked* right but failed in subtle ways (silent fallbacks, missed validation rules, partial implementations claimed as complete). Re-running with sonnet fixed the work in one shot. Total time-to-correct-output was lower starting with the stronger model.
+
+## How to apply
+
+- When calling `Task` / `Agent`: explicitly set `model: "sonnet"` (implementation) or `model: "opus"` (review / design).
+- When authoring an implementation plan (`writing-plans` skill): every task that names a model uses sonnet or opus. Reject any plan template that suggests haiku.
+- If you find yourself thinking "this task is so simple haiku could do it" — it isn't. Either it's mechanical enough to do inline (no subagent), or it needs sonnet.
+- A subagent that returns BLOCKED, gives confused output, or produces wrong code is often a model-choice failure, not a task failure. Re-dispatch with a more capable model before re-explaining the task.
+
+## Scope
+
+This rule applies to the Anthropic / Claude Code subagent dispatch surface used during development. It does NOT prescribe model choice for production app code (if the project itself calls an LLM, that decision is made on its own merits in product code, not under this rule).
+```
+
+**2. CLAUDE.md operating principle entry** (append to the project's existing operating-principles list, renumbering as needed):
+
+```markdown
+N. **Subagent model floor: never haiku.** Every Agent / Task dispatch — including in implementation plans — uses sonnet (mechanical) or opus (design / review). Haiku is forbidden regardless of task simplicity. See [`rules/subagent-models.md`](rules/subagent-models.md). Plans that name a model per task MUST cite this rule and pick from sonnet/opus only.
+```
+
+The CLAUDE.md citation is what makes this rule visible during plan creation. Without it, plans authored by `writing-plans` may silently default to haiku for tasks the skill classifies as "mechanical" — which is exactly the failure mode this rule prevents.
 
 Add new entries to this defaults section only when a decision is genuinely universal across the user's projects (not project-specific). Project-specific choices belong in that project's `rules/`, not here.
 
