@@ -206,6 +206,16 @@ setopt PROMPT_SUBST              # Enable prompt substitution
 # ══════════════════════════════════════════════════════════════════════════════
 # KEY BINDINGS
 # ══════════════════════════════════════════════════════════════════════════════
+#
+# ──── EDIT-LINE CHEAT SHEET (zsh emacs-mode + Ghostty option-as-alt) ────
+# Move:           Ctrl+A start  |  Ctrl+E end  |  Alt+B word←  |  Alt+F word→
+# Delete:         Ctrl+W word←  |  Alt+D word→ |  Ctrl+U to-start | Ctrl+K to-end
+# Paste killed:   Ctrl+Y         (yank last killed text back at cursor)
+# Undo edit:      Ctrl+_
+# Typo fix:       Ctrl+T         (swap last two chars before cursor)
+# Last arg:       Alt+.          (insert last word of prev cmd; repeat to walk back)
+# Edit in nvim:   Ctrl+X Ctrl+E
+# ─────────────────────────────────────────────────────────────────────────
 
 # Use emacs key bindings
 bindkey -e

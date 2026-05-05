@@ -40,6 +40,9 @@ cursor-style-blink = true
 mouse-hide-while-typing = true
 copy-on-select = clipboard
 
+# Send Option as Alt so zsh emacs-mode bindings work (Alt+B/F/D/., etc.)
+macos-option-as-alt = true
+
 # ───────────────────────────────────────────────────────────────────────────
 # QUICK TERMINAL (Quake-style dropdown: Ctrl+`)
 # ───────────────────────────────────────────────────────────────────────────
