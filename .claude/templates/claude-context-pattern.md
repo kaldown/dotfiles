@@ -68,6 +68,7 @@ User-level conventions that apply across all the user's projects, independent of
 | **Pre-commit local validation** | Project has any CI gating (lint, typecheck, tests, migration check) and pushes to `main` deploy to production. | `rules/pre-commit-checks.md` declaring a single aggregator command (`make check`, `pnpm check`, `cargo check`, etc.) that mirrors CI checks in CI order and must be green before every commit. Project must expose the aggregator alongside individual targets. |
 | **Testing scope: own logic, not libraries** | Project has any test suite. | `rules/testing-scope.md` (or `rules/testing.md` if the project already uses that filename) declaring what is in scope (pure logic, domain invariants, anything where a regression in our code silently changes observable behavior) and what is out of scope (settings parsing, third-party integrations, HTTP probes against external services, UI rendering, configuration boilerplate). |
 | **Subagent model floor: never haiku** | Project uses Claude Code subagent dispatch (Agent / Task tool) — including in implementation plans authored by `writing-plans`. | `rules/subagent-models.md` declaring sonnet as the floor for mechanical/implementation dispatches and opus for design/review dispatches; haiku forbidden regardless of task simplicity. CLAUDE.md operating principles cite the rule explicitly so it surfaces during plan creation. |
+| **Plan-lifecycle gate: move executed plans** | Project uses transient implementation plans (e.g., from `superpowers:writing-plans`, `feature-dev:feature-dev`, or hand-written). | `rules/plan-lifecycle.md` declaring the move-to-`completed/` rule as a completion gate: a plan is not "done" until its file is moved out of the active directory. CLAUDE.md operating principles cite the rule so it triggers at completion time, not as a buried directory layout bullet. |
 
 ### Rationale (so future scaffolds can judge overrides)
 
@@ -94,6 +95,10 @@ User-level conventions that apply across all the user's projects, independent of
 **Subagent model floor chosen because:** the user has repeatedly observed that haiku-class models produce code that *looks* correct but fails subtly — silent fallbacks, missed validation rules, partial implementations claimed as complete — even when given a clear plan. Re-dispatching the same task on sonnet returns correct work in one shot. Total time-to-correct-output is lower starting from sonnet than from haiku-then-sonnet; the apparent compute saving from haiku is a false economy. The `writing-plans` skill's per-task model-selection table (mechanical → cheap, integration → standard, design → capable) still applies for picking *between* sonnet and opus — the floor moves up, the gradient stays.
 
 **Override the subagent-model-floor default if:** never, in practice. This is a hard floor, not a default. If a future model release introduces a tier between haiku and sonnet that proves reliable, this rule gets revised explicitly — not silently bypassed.
+
+**Plan-lifecycle gate chosen because:** the skill chain that produces and executes plans (`superpowers:brainstorming` → `superpowers:writing-plans` → `superpowers:subagent-driven-development` → `superpowers:finishing-a-development-branch`) ends at clean boundaries that do not include plan-file cleanup. With the rule only documented as a workspace-layout bullet, Claude finishes the last task and reports "done" without ever moving the plan — every time, in every project. Surfacing the rule as a CLAUDE.md operating principle (not just a `rules/` entry) turns it into a completion-time tripwire. The `completed/` directory exists so the planning trail is preserved (as personal gitignored scratch) without polluting the active queue.
+
+**Override the plan-lifecycle default if:** never. The directory paths can change to fit a project's existing convention (e.g., a project that commits plans under `docs/plans/` adapts the path), but the move-on-completion ritual stays. A project where plans are not used at all does not need the rule — the trigger is "project uses transient plans."
 
 ### What to scaffold in the new project's `rules/deployment.md`
 
@@ -293,6 +298,119 @@ N. **Subagent model floor: never haiku.** Every Agent / Task dispatch — includ
 ```
 
 The CLAUDE.md citation is what makes this rule visible during plan creation. Without it, plans authored by `writing-plans` may silently default to haiku for tasks the skill classifies as "mechanical" — which is exactly the failure mode this rule prevents.
+
+### What to scaffold for git-safety
+
+Two artifacts: a `rules/git-safety.md` file and an explicit citation in `CLAUDE.md` operating principles. The CLAUDE.md surface is mandatory because plan creation and subagent dispatch both happen with `CLAUDE.md` in context — and this rule needs to be there every time a plan is authored or a subagent is sent shell access. Without that surface, the rule sits in `rules/` and gets skipped exactly when it matters.
+
+**1. `rules/git-safety.md`:**
+
+```markdown
+# Git safety
+
+Destructive git operations have caused real incidents (lost commits, silent overwrites of unrelated test files, inconsistent working trees that masked test failures). The rule is binding for the human, for Claude directly, and for every subagent dispatched from any plan.
+
+## The rule
+
+**Never run any of the following without explicit user approval:**
+
+- `git stash` (any flavor — `push`, `pop`, `apply`, `drop`)
+- `git checkout <ref> -- <file>` (file restoration from another commit)
+- `git checkout -- <file>` (discard working-tree changes)
+- `git restore` (any flavor)
+- `git reset` (any flavor — soft, mixed, hard)
+- `git clean`
+- `git rebase`
+- `git revert`
+- `git push --force` / `git push --force-with-lease`
+- `git branch -D` / `git branch --delete --force`
+- `git worktree remove`
+
+If a task appears to require any of these, STOP and ask. Describe the exact command, the reason it appears necessary, and the files / refs it would touch. Wait for explicit approval. The cost of asking is one message; the cost of silently destroying state is unbounded.
+
+## Allowed without asking
+
+- **Read-only git:** `status`, `log`, `diff`, `show`, `rev-parse`, `ls-files`, `blame`, `branch --show-current`. These never alter state.
+- **`git add <specific paths>` and `git commit`** for paths the user (or an approved plan) explicitly named. Never `git add -A` or `git add .` — those quietly stage unintended files (`.env`, build artifacts, scratch notes).
+- **`git checkout -b <name>`** on a clean working tree. Branch creation is non-destructive.
+
+## Never silence errors
+
+`2>/dev/null`, `|| true`, `&> /dev/null`, and the equivalent in any shell are forbidden in git command chains regardless of subcommand. Hidden failures are exactly what allow destructive sequences to slip through review. If a command might fail, the failure must be visible — surface it, don't suppress it.
+
+## Why
+
+The trigger incident: a reviewer subagent proposed
+`git stash; git checkout <old-sha> -- tests/integration.rs; git checkout <branch> -- tests/integration.rs; git stash pop 2>/dev/null`
+while reviewing a change that did not touch `tests/integration.rs` at all. The user caught it. They will not always catch it. The combination of (a) destructive ops out of scope and (b) error-silencing was specifically designed to look benign — that's what makes the rule binding rather than discretionary.
+
+## How to apply
+
+- **Direct work:** before typing any forbidden command, stop and ask.
+- **Plan authoring:** every implementation plan MUST include a "Subagent guardrails" section that repeats this rule. No plan ships without it. Plans missing this section should be rejected during self-review.
+- **Subagent dispatch:** every Agent / Task dispatch prompt MUST include this rule verbatim. Never assume the subagent inherits context — the prompt is the only briefing they get.
+- **Reviewing subagent output:** if a subagent reports having run a forbidden command, treat the result as compromised. Verify with read-only commands and surface to the user before relying on the work.
+
+## Scope
+
+Applies to git operations against the project's working tree and history. Does not apply to git operations on unrelated scratch directories the user explicitly designated as throwaway. When in doubt, ask.
+```
+
+**2. CLAUDE.md operating principle entry** (append to the project's existing operating-principles list, renumbering as needed):
+
+```markdown
+N. **Git safety: never run destructive git commands without asking.** `stash`, `checkout <ref> -- <file>`, `restore`, `reset`, `clean`, `rebase`, `revert`, `push --force`, `branch -D`, `worktree remove` — all require explicit user approval before execution, by Claude directly and by every subagent dispatched from any plan. Read-only git is fine; `git add <specific paths>` and `git commit` are fine for explicitly named paths. Never silence errors (`2>/dev/null` etc.). See [`rules/git-safety.md`](rules/git-safety.md). Plans MUST include a "Subagent guardrails" section that repeats this rule; subagent dispatch prompts MUST cite it.
+```
+
+The CLAUDE.md citation is what makes this rule visible during plan creation and subagent dispatch. It sits next to the subagent-model-floor entry — together they cover "which model" and "what shell access" for every dispatch.
+
+### What to scaffold for plan-lifecycle
+
+Two artifacts: a `rules/plan-lifecycle.md` file and an explicit citation in `CLAUDE.md` operating principles. The CLAUDE.md surface is mandatory — without it, the rule sits in `rules/` and never gets read at completion time, since none of the plan-execution skill flows include plan-file cleanup as a step.
+
+**1. `rules/plan-lifecycle.md`:**
+
+```markdown
+# Plan lifecycle
+
+Implementation plans live under `.claude/plans/` (gitignored, transient). Once a plan is fully executed, its file moves to `.claude/plans/completed/` — it is not deleted. The move is a completion gate, not an afterthought.
+
+## The rule
+
+A plan isn't complete until its file has been moved. The order is:
+
+1. Final task of the plan committed.
+2. Verification done (pre-commit checks green; manual checks if applicable).
+3. **`mv .claude/plans/<plan>.md .claude/plans/completed/`** — *this step*.
+4. Now you may report "done" to the user.
+
+If you are about to say "all tasks complete", "implementation finished", "the plan is done", or anything similar without having performed step 3, stop. Move the file first.
+
+## Why
+
+- The `docs/specs/` document and the git history are the durable, committed record of what was built and why. The plan is transient scaffolding for one execution session.
+- `.claude/plans/` should reflect *active* plans only. Once executed, a plan no longer guides work; keeping it at the top level looks like an in-flight queue when it isn't.
+- Deleting plans loses the planning trail. Moving to `completed/` preserves it as personal scratch (still gitignored) without polluting the active queue.
+- The skill flows that produce and execute plans end at clean boundaries that do *not* include plan-file cleanup. Without an explicit project-level rule surfaced as a completion gate, the move gets skipped on every plan.
+
+## How to apply
+
+- During execution: do not declare a plan finished until the file is in `completed/`. Treat the move as part of the plan's completion ritual, on the same level as pre-commit checks passing.
+- During reading: when surveying `.claude/plans/`, files outside `completed/` are *active*. If you find an old plan-looking file at the top level, ask whether it's truly active or just unfinished cleanup before assuming.
+- Across the project: applies to plans created via any skill or hand-written. The directory is the contract; the skill that authored the plan does not matter.
+
+## Scope
+
+Applies to `.claude/plans/`. Specs in `docs/specs/` follow a separate convention — they are committed documentation; a spec is not "completed" by file move, it stays put as the project's history.
+```
+
+**2. CLAUDE.md operating principle entry** (append to the project's existing operating-principles list, renumbering as needed):
+
+```markdown
+N. **Plan-lifecycle gate.** A plan in `.claude/plans/` isn't complete until its file is moved to `.claude/plans/completed/`. After the final task of a plan is committed, move the file *before* reporting "done" to the user. The move is part of the completion ritual, on the same level as pre-commit checks passing. See [`rules/plan-lifecycle.md`](rules/plan-lifecycle.md).
+```
+
+If the project uses a different plan-file location (e.g., `docs/plans/`), adapt the paths in both the rule body and the operating principle. The directory layout is project-shaped; the move-on-completion ritual is universal.
 
 Add new entries to this defaults section only when a decision is genuinely universal across the user's projects (not project-specific). Project-specific choices belong in that project's `rules/`, not here.
 
