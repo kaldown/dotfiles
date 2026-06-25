@@ -1,4 +1,5 @@
 {
+  "skillListingBudgetFraction": 0.02,
   "env": {
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
     "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "95",
@@ -133,7 +134,7 @@
     "feature-dev@claude-plugins-official": true,
     "python-development@claude-code-workflows": true,
     "debugging-toolkit@claude-code-workflows": false,
-    "documentation-generation@claude-code-workflows": true,
+    "documentation-generation@claude-code-workflows": false,
     "pyright-lsp@claude-plugins-official": true,
     "code-documentation@claude-code-workflows": false,
     "code-refactoring@claude-code-workflows": false,
@@ -146,15 +147,15 @@
     "hookify@claude-plugins-official": false,
     "code-simplifier@claude-plugins-official": true,
     "codebase-cleanup@claude-code-workflows": false,
-    "developer-essentials@claude-code-workflows": true,
-    "error-debugging@claude-code-workflows": true,
+    "developer-essentials@claude-code-workflows": false,
+    "error-debugging@claude-code-workflows": false,
     "error-diagnostics@claude-code-workflows": false,
-    "tdd-workflows@claude-code-workflows": true,
+    "tdd-workflows@claude-code-workflows": false,
     "unit-testing@claude-code-workflows": false,
     "cicd-automation@claude-code-workflows": false,
     "superpowers@claude-plugins-official": true,
     "claude-md-management@claude-plugins-official": true,
-    "claude-code-setup@claude-plugins-official": true,
+    "claude-code-setup@claude-plugins-official": false,
     "gitlab@claude-plugins-official": false,
     "skill-creator@claude-plugins-official": true,
     "explanatory-output-style@claude-plugins-official": false,
@@ -165,30 +166,28 @@
     "security-guidance@claude-plugins-official": false,
     "commit-commands@claude-plugins-official": true,
     "serena@claude-plugins-official": false,
-    "pr-review-toolkit@claude-plugins-official": true,
+    "pr-review-toolkit@claude-plugins-official": false,
     "plugin-dev@claude-plugins-official": false,
     "slack@claude-plugins-official": false,
     "playground@claude-plugins-official": false,
-    "chrome-devtools-mcp@claude-plugins-official": false,
-    "deploy-on-aws@claude-plugins-official": false,
-    "aws-serverless@claude-plugins-official": false,
     "microsoft-docs@claude-plugins-official": false,
     "mintlify@claude-plugins-official": false,
     "atomic-agents@claude-plugins-official": false,
     "telegram@claude-plugins-official": false,
-    "revdiff@revdiff": true,
     "remember@claude-plugins-official": true,
     "circleback@claude-plugins-official": false,
     "sourcegraph@claude-plugins-official": false,
-    "goodmem@claude-plugins-official": false,
-    "optibot@claude-plugins-official": true,
-    "sentry@claude-plugins-official": false
+    "sentry@claude-plugins-official": false,
+    "claude-mem@thedotmack": true,
+    "differential-review@trailofbits": true,
+    "insecure-defaults@trailofbits": true,
+    "supply-chain-risk-auditor@trailofbits": true
   },
   "extraKnownMarketplaces": {
-    "revdiff": {
+    "trailofbits": {
       "source": {
         "source": "github",
-        "repo": "umputun/revdiff"
+        "repo": "trailofbits/skills"
       }
     }
   },
@@ -228,7 +227,9 @@
   },
   "alwaysThinkingEnabled": true,
   "effortLevel": "xhigh",
+  "promptSuggestionEnabled": false,
   "plansDirectory": ".claude/plans",
+  "skipWorkflowUsageWarning": true,
   "verbose": true,
   "autoCompactEnabled": false,
   "teammateMode": "tmux",

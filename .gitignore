@@ -64,3 +64,5 @@ go/
 *.bak
 
 *~
+
+**/.claude/settings.local.json

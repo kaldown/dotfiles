@@ -107,13 +107,15 @@ alias dotconfig='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 # lazydocker
 (( ${+commands[lazydocker]} )) && alias lzd='lazydocker'
 
+# replaced by sbx
 # Sync plugins from host to Docker sandbox (fixes paths, scope, orphan markers)
-sync-claude-plugins() {
-    ~/.claude/scripts/sandbox/sync-plugins.sh "$@"
-}
+# sync-claude-plugins() {
+#     ~/.claude/scripts/sandbox/sync-plugins.sh "$@"
+# }
 
+# replaced by sbx
 # Claude sandbox with persistent plugins volume
-alias claude-sandbox='docker sandbox run -v docker-claude-plugins:/home/agent/.claude/plugins claude'
+# alias claude-sandbox='docker sandbox run -v docker-claude-plugins:/home/agent/.claude/plugins claude'
 
 # ------------------------------------------------------------------------------
 # PYTHON / UV
@@ -236,6 +238,21 @@ gitremoveprev() {
   [[ -z "$prev" ]] && { echo "No previous branch found."; return 1; }
   read "confirm?Delete branch '$prev'? [y/N] " && [[ $confirm == [yY] ]] && git branch -D "$prev"
 }
+
+#claude() {
+#  local ctx dir label color
+#  printf "Claude session — [w]ork or [p]ersonal? "
+#  read -r ctx
+#  case "$ctx" in
+#    w|W) dir=~/.claude-work;     label="WORK";     color="1;31" ;;  # red
+#    p|P) dir=~/.claude-personal; label="PERSONAL"; color="1;32" ;;  # green
+#    *)   echo "Aborted (expected w or p)"; return 1 ;;
+#  esac
+#  mkdir -p "$dir"
+#  print -Pn "\e]0;Claude ($label)\a"                  # terminal tab title
+#  printf "\e[%sm═══ Claude %s account ═══\e[0m\n" "$color" "$label"
+#  CLAUDE_CONFIG_DIR="$dir" command claude "$@"
+#}
 
 # ------------------------------------------------------------------------------
 # ORIGINAL COMMAND ACCESS (for reference)

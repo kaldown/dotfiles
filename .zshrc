@@ -97,7 +97,16 @@ fpath=(
   $fpath
 )
 autoload -Uz compinit
-compinit
+# Rebuild the completion dump at most once a day; otherwise load it with -C,
+# which skips the (slow) insecure-directory security audit. Shaves tens of ms
+# off startup. Needs extended_glob for the (#qN.mh+24) "older than 24h"
+# qualifier — it's also set globally further below.
+setopt extended_glob
+if [[ -n ${ZDOTDIR:-$HOME}/.zcompdump(#qN.mh+24) ]]; then
+  compinit
+else
+  compinit -C
+fi
 
 # ══════════════════════════════════════════════════════════════════════════════
 # ZINIT SETUP
@@ -327,6 +336,7 @@ eval "$(atuin init zsh)"
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
 
-
-# sentry
-fpath=("/Users/kaldown/.local/share/zsh/site-functions" $fpath)
+# sentry — when reinstalled via Homebrew the CLI links into /opt/homebrew/bin
+# (already on PATH via `brew shellenv` up top), so no version-pinned Cellar PATH
+# is needed. Keep the completions dir on fpath.
+fpath=("$HOME/.local/share/zsh/site-functions" $fpath)

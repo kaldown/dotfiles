@@ -288,7 +288,11 @@ inline_height = 30
 show_preview = true
 enter_accept = true
 store_failed = false
-keymap_mode = "vim-normal"
+# "auto" follows the shell keymap (your zsh uses emacs `bindkey -e`), so
+# Backspace deletes in the search popup. "vim-normal" opens in NORMAL mode
+# where Backspace is just a motion and won't erase — switch back if you
+# actually want modal editing here.
+keymap_mode = "auto"
 
 # Format for `atuin history` CLI command (does NOT affect TUI search)
 history_format = "{command}"
